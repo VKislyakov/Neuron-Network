@@ -300,9 +300,9 @@ private:
 
 int main()
 {
-	vector<int> mm = { 2,1,6,1 }; // параметры сети
-	vector<bool> eroug;// вектор фиксирующий конец эпохи, размерность формируется в процессе создания обучающего мн-ва
-	double erou = true;
+	vector<int> settings_net = { 2,1,6,1 }; // параметры сети
+	vector<bool> epoch;// вектор фиксирующий конец эпохи, размерность формируется в процессе создания обучающего мн-ва
+	double epoch_control = true;
 	//	Формирование обучающего и тестогвого множества
 	vector<vector<double>> test = { { 0.022 },{ 0.067 },{ 0.125 },{ 0.16 },{ 0.22 },{ 0.27 },{ 0.32 },{ 0.37 },{ 0.40 },{ 0.469 },{ 0.518 },{ 0.57 } };
 	vector<vector<double>> test_d;
@@ -315,76 +315,77 @@ int main()
 	for (int i = 0; i < x.size(); i++) {
 		vector<double> a = { sin(10 * x[i][0]) / 2 };
 		d.push_back(a);
-		eroug.push_back(false);
+		epoch.push_back(false);
 	}
 	// начало
-	int c;
-	cout << "vvedite '0' chtobi zapystit NE obychaia ili '1' chtobi obychit";
-	cin >> c;
+	int start_control;
+	cout << "1 - start with teacing"<< endl <<" 0 - start without teacing"<<endl;
+	cin >> start_control;
 
-	if (c == 0) { // запуск уже обученной сети
-		net nn(true);
+	if (start_control == 0) { // запуск уже обученной сети
+		net General_Net(true);
 		ofstream out("rez.txt");
 		for (double i = 0.01; i <0.63; i = i + 0.01) {
 			x[0][0] = i;
-			d[0] = nn.startnet(x[0]);
+			d[0] = General_Net.startnet(x[0]);
 			out << d[0][0] << endl;
 		}
 		out.close();
 
 	}
 	else {
-		int i = 0; // кол-во эпох
-		int	k = 0; // используестся при выборе рандомного эл-та обуч. мн-ва
-		net nn(mm);
+		int number_epoсh = 0; // кол-во эпох
+		int	random_key = 0; // используестся при выборе рандомного эл-та обуч. мн-ва
+		net General_Net(settings_net);
 
-		ofstream out("errou_teach.txt");
-		ofstream out2("errou_test.txt");
+		ofstream out_errou_teach("errou_teach.txt");
+		ofstream out_errou_test("errou_test.txt");
 
-		double er = 10, er_test = 10;
+		double errou_teach = 10, errou_test = 10;
 		double e = 0.0001;
-		while (er > e && i<100000)
+		while (errou_teach > e && number_epoсh<100000)
 		{
 			for (int j = 0; j < x.size(); j++) // сбор данных об эпохе
-				erou = erou && eroug[j];
-			if (erou) {	// проверка конца эпохи 
+				epoch_control = epoch_control && epoch[j];
+			if (epoch_control) {	// проверка конца эпохи 
 				for (int j = 0; j < x.size(); j++) // откатывает данные об эпохе
-					eroug[j] = false;
-				i++;
-				er = 0;
+					epoch[j] = false;
+				number_epoсh++;
+				errou_teach = 0;
 				for (int j = 0; j < x.size(); j++) // вычисление ошибки
 				{
-					er = er + nn.functionError(nn.startnet(x[j]), d[j]);
+					errou_teach = errou_teach + General_Net.functionError(General_Net.startnet(x[j]), d[j]);
 				}
-				if (i % 20 == 0 || i < 30 || er < e + e) { //вывод ошибки/условия
-					cout << i << " == " << er << endl;
-					out << i << " " << er << endl;
-					er_test = 0;
+				if (number_epoсh % 20 == 0 || number_epoсh < 30 || errou_teach < e + e) { //вывод ошибки/условия
+					cout << number_epoсh << " == " << errou_teach << endl;
+					out_errou_teach << number_epoсh << " " << errou_teach << endl;
+					errou_test = 0;
 					for (int j = 0; j < test.size(); j++)
 					{
-						er_test = er_test + nn.functionError(nn.startnet(test[j]), test_d[j]);
+						errou_test = errou_test + General_Net.functionError(General_Net.startnet(test[j]), test_d[j]);
 					}
-					cout << i << " test== " << er_test << endl;
-					out2 << i << " " << er_test << endl;
+					cout << number_epoсh << " test== " << errou_test << endl;
+					out_errou_test << number_epoсh << " " << errou_test << endl;
 
 				}
-				if (i % 200 == 0 || er <= e + e) { // сохранение весов/условия
-					nn.save();
+				if (number_epoсh % 200 == 0 || errou_teach <= e + e) { // сохранение весов/условия
+					General_Net.save();
 				}
 			}
 
-			erou = true;
-			k = rand() % x.size(); // выбор рандомного эл-та обуч. мн-ва
-			nn.teach(x[k], d[k]);
-			eroug[k] = true;
+			epoch_control = true;
+			random_key = rand() % x.size(); // выбор рандомного эл-та обуч. мн-ва
+			General_Net.teach(x[random_key], d[random_key]);
+			epoch[random_key] = true;
 
 		}
-		out.close();
-		out.open("rez.txt");
+		out_errou_teach.close();
+
+		out_errou_teach.open("rez.txt");
 		for (double i = 0.01; i < 0.63; i = i + 0.01) {
 			x[0][0] = i;
-			d[0] = nn.startnet(x[0]);
-			out << d[0][0] << endl;
+			d[0] = General_Net.startnet(x[0]);
+			out_errou_teach << d[0][0] << endl;
 		}
 	}
 
