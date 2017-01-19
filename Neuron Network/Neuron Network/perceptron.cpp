@@ -9,30 +9,30 @@ using namespace std;
 class neuron
 {
 public:
-	neuron(int k) {
-		for (int i = 0; i <= k; i++) // на один больше чем на предыдушем слое нейнонов
-			weight.push_back(0.0001 * (rand() % 4001 - 2000));  // от -0.2 до 0.2
+	neuron(int number_weight) {
+		for (int i = 0; i <= number_weight; i++) // на один больше чем на предыдушем слое нейнонов
+			weights.push_back(0.0001 * (rand() % 4001 - 2000));  // от -0.2 до 0.2
 		sum = 0;
 		F = 0;
 	}
-	neuron(vector<double> w) {
-		weight = w;
+	neuron(vector<double> verton_weight) {
+		weights = verton_weight;
 		sum = 0;
 		F = 0;
 	}
 	int set_KolWeig() {
-		return(int(weight.size()));
+		return(int(weights.size()));
 	}
 	vector<double> set_AllWeights() { // отдать вектор весов
-		return weight;
+		return weights;
 	}
-	double set_ElemWeight(int i) {
-		return(weight[i]);
+	double set_ElemWeight(int number) {
+		return(weights[number]);
 	}
 	double Sum(vector<double> x) {
-		sum = weight[weight.size() - 1];
-		for (int i = 0; i < weight.size() - 1; i++)
-			sum = sum + weight[i] * x[i];
+		sum = weights[weights.size() - 1];
+		for (int i = 0; i < weights.size() - 1; i++)
+			sum = sum + weights[i] * x[i];
 		return sum;
 	}
 	double Sum() {
@@ -47,16 +47,16 @@ public:
 		return F;
 	}
 	void correct_weights(double deltaW, vector<double> y, double alfa) {
-		for (int i = 0; i < weight.size() - 1; i++)
-			weight[i] = weight[i] - deltaW * y[i] * alfa;
-		weight[weight.size() - 1] = weight[weight.size() - 1] - deltaW * alfa;
+		for (int i = 0; i < weights.size() - 1; i++)
+			weights[i] = weights[i] - deltaW * y[i] * alfa;
+		weights[weights.size() - 1] = weights[weights.size() - 1] - deltaW * alfa;
 	}
 	void get_NewVectorWeights(vector<double> W) {
-		weight = W;
+		weights = W;
 	}
 
 private:
-	vector<double> weight;
+	vector<double> weights;
 	double sum;
 	double F;
 };
