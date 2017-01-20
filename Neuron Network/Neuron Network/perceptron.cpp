@@ -10,8 +10,8 @@ class neuron
 {
 public:
 	neuron(int number_weight) {
-		for (int i = 0; i <= number_weight; i++) // Г­Г  Г®Г¤ГЁГ­ ГЎГ®Г«ГјГёГҐ Г·ГҐГ¬ Г­Г  ГЇГ°ГҐГ¤Г»Г¤ГіГёГҐГ¬ Г±Г«Г®ГҐ Г­ГҐГ©Г­Г®Г­Г®Гў
-			weights.push_back(0.0001 * (rand() % 4001 - 2000));  // Г®ГІ -0.2 Г¤Г® 0.2
+		for (int i = 0; i <= number_weight; i++) // на один больше чем на предыдушем слое нейнонов
+			weights.push_back(0.0001 * (rand() % 4001 - 2000));  // от -0.2 до 0.2
 		sum = 0;
 		F = 0;
 	}
@@ -23,7 +23,7 @@ public:
 	int set_KolWeig() {
 		return(int(weights.size()));
 	}
-	vector<double> set_AllWeights() { // Г®ГІГ¤Г ГІГј ГўГҐГЄГІГ®Г° ГўГҐГ±Г®Гў
+	vector<double> set_AllWeights() { // отдать вектор весов
 		return weights;
 	}
 	double set_ElemWeight(int number) {
@@ -101,10 +101,10 @@ public:
 		}
 		return 0;
 	}
-	vector<double> set_VectW(int i) { // Г®ГІГ¤Г ГҐГІ ГўГҐГ±Г  ГЄГ®Г­ГЄГ°ГҐГІГ­Г®ГЈГ® Г­ГҐГ©Г°Г®Г­Г 
+	vector<double> set_VectW(int i) { // отдает веса конкретного нейрона
 		return neurons[i].set_AllWeights();
 	}
-	vector<vector<double>> set_MatrixW() { // Г®ГІГ¤Г ГҐГІ Г¬Г ГІГ°ГЁГ¶Гі ГўГҐГ±Г®Гў ГўГ±ГҐГµ Г­ГҐГ©Г°Г®Г­Г®Гў Г±Г«Г®Гї
+	vector<vector<double>> set_MatrixW() { // отдает матрицу весов всех нейронов слоя
 		vector<vector<double>> matrix;
 		for (int i = 0; i<neurons.size(); i++) {
 			matrix.push_back(set_VectW(i));
@@ -170,13 +170,14 @@ public:
 			layers.push_back(a);
 		}
 	}
-	vector<double> startnet(vector<double> x) { // Г§Г ГЇГіГ±ГЄ
+	vector<double> startnet(vector<double> x) { // запуск
 		for (int i = 0; i<config[0]; i++) {
 			x = layers[i].actF(x);
 		}
+
 		return x;
 	}
-	//	Г¬Г ГІГ°ГЁГ¶Г  Г¤ГҐГ«ГјГІ Г¤Г«Гї ГўГ±ГҐГµ Г­ГҐГ©Г°Г®Г­Г®Гў
+	//	матрица дельт для всех нейронов
 	double teach(vector<double> x, vector<double> d) {
 		vector<double> y = startnet(x);
 		vector<vector<double>> delta = deltaM(d);
@@ -207,7 +208,7 @@ public:
 		return(W);
 	}
 	int teaching(vector<double> x, vector<double> d){
-	return(0);
+
 
 	}
 private:
@@ -224,7 +225,7 @@ private:
 		return errorf / 2;
 	}
 	vector<vector<double>> deltaM(vector<double> d) {
-		//	Г®ГЇГ°ГҐГ¤ГҐГ«ГїГҐГ¬ Г¤ГҐГ«ГјГІГ» Г­Г  ГЇГ®Г±Г«ГҐГ¤Г­ГҐГ¬ Г±Г«Г®ГҐ
+		//	определяем дельты на последнем слое
 		vector<double> deltalay;
 		vector<vector<double>> delta(config[0]);
 		vector<double> activf = layers[config[0] - 1].actF();
@@ -232,15 +233,15 @@ private:
 			deltalay.push_back((activf[i] - d[i])*(1 - activf[i] * activf[i]));
 		}
 		delta[config[0] - 1] = deltalay;
-		//	Г§Г ГЄГ®Г­Г·ГЁГ«ГЁ Г­Г ГµГ®Г¤ГЁГІГј Г¤ГҐГ«ГјГІГ» ГЇГ®Г±Г«ГҐГ¤Г­ГҐГЈГ® Г±Г«Г®Гї
-		//	Г®ГЇГ°ГҐГ¤ГҐГ«ГїГҐГ¬ Г¤ГҐГ«ГјГІГ» Г­Г  Г®Г±ГІГ Г«ГјГ­Г»Гµ Г±Г«Г®ГїГµ
+		//	закончили находить дельты последнего слоя
+		//	определяем дельты на остальных слоях
 		vector<vector<double>> matrix_w;
-		for (int lay = config[0] - 2; lay >= 0; lay--) {// lay Г­Г®Г¬ГҐГ° Г±Г«Г®Гї
+		for (int lay = config[0] - 2; lay >= 0; lay--) {// lay номер слоя
 			deltalay.clear();
 			activf.clear();
 			matrix_w.clear();
-			matrix_w = layers[lay + 1].set_MatrixW();// ГўГҐГ±Г  Г­ГҐГ©Г°Г®Г­Г®Гў Г±Г«Г®Гї lay+1
-			vector<double> activf = layers[lay].actF();// ГўГ»ГµГ®Г¤Г­Г»ГҐ Г§Г­Г Г·ГҐГ­ГЁГї Г±Г«Г®Гї lay
+			matrix_w = layers[lay + 1].set_MatrixW();// веса нейронов слоя lay+1
+			vector<double> activf = layers[lay].actF();// выходные значения слоя lay
 			double sum_del_w;
 			for (int j = 0; j<config[lay + 2]; j++) {
 				sum_del_w = 0;
@@ -251,7 +252,7 @@ private:
 			}
 			delta[lay] = deltalay;
 		}
-		//	Г§Г ГЄГ®Г­Г·ГЁГ«ГЁ Г­Г ГµГ®Г¤ГЁГІГј Г¤ГҐГ«ГјГІГ»
+		//	закончили находить дельты
 		return delta;
 	}
 	void correct(vector<vector<double>> delta, double alfa, vector<double> x) {
@@ -301,10 +302,10 @@ private:
 
 int main()
 {
-	vector<int> settings_net = { 2,1,6,1 }; // ГЇГ Г°Г Г¬ГҐГІГ°Г» Г±ГҐГІГЁ
-	vector<bool> epoch;// ГўГҐГЄГІГ®Г° ГґГЁГЄГ±ГЁГ°ГіГѕГ№ГЁГ© ГЄГ®Г­ГҐГ¶ ГЅГЇГ®ГµГЁ, Г°Г Г§Г¬ГҐГ°Г­Г®Г±ГІГј ГґГ®Г°Г¬ГЁГ°ГіГҐГІГ±Гї Гў ГЇГ°Г®Г¶ГҐГ±Г±ГҐ Г±Г®Г§Г¤Г Г­ГЁГї Г®ГЎГіГ·Г ГѕГ№ГҐГЈГ® Г¬Г­-ГўГ 
+	vector<int> settings_net = { 2,1,6,1 }; // параметры сети
+	vector<bool> epoch;// вектор фиксирующий конец эпохи, размерность формируется в процессе создания обучающего мн-ва
 	double epoch_control = true;
-	//	Г”Г®Г°Г¬ГЁГ°Г®ГўГ Г­ГЁГҐ Г®ГЎГіГ·Г ГѕГ№ГҐГЈГ® ГЁ ГІГҐГ±ГІГ®ГЈГўГ®ГЈГ® Г¬Г­Г®Г¦ГҐГ±ГІГўГ 
+	//	Формирование обучающего и тестогвого множества
 	vector<vector<double>> test = { { 0.022 },{ 0.067 },{ 0.125 },{ 0.16 },{ 0.22 },{ 0.27 },{ 0.32 },{ 0.37 },{ 0.40 },{ 0.469 },{ 0.518 },{ 0.57 } };
 	vector<vector<double>> test_d;
 	for (int i = 0; i < test.size(); i++) {
@@ -318,12 +319,12 @@ int main()
 		d.push_back(a);
 		epoch.push_back(false);
 	}
-	// Г­Г Г·Г Г«Г®
+	// начало
 	int start_control;
 	cout << "1 - start with teacing"<< endl <<" 0 - start without teacing"<<endl;
 	cin >> start_control;
 
-	if (start_control == 0) { // Г§Г ГЇГіГ±ГЄ ГіГ¦ГҐ Г®ГЎГіГ·ГҐГ­Г­Г®Г© Г±ГҐГІГЁ
+	if (start_control == 0) { // запуск уже обученной сети
 		net General_Net(true);
 		ofstream out("rez.txt");
 		for (double i = 0.01; i <0.63; i = i + 0.01) {
@@ -335,8 +336,8 @@ int main()
 
 	}
 	else {
-		int number_epoГ±h = 0; // ГЄГ®Г«-ГўГ® ГЅГЇГ®Гµ
-		int	random_key = 0; // ГЁГ±ГЇГ®Г«ГјГ§ГіГҐГ±ГІГ±Гї ГЇГ°ГЁ ГўГ»ГЎГ®Г°ГҐ Г°Г Г­Г¤Г®Г¬Г­Г®ГЈГ® ГЅГ«-ГІГ  Г®ГЎГіГ·. Г¬Г­-ГўГ 
+		int number_epoсh = 0; // кол-во эпох
+		int	random_key = 0; // используестся при выборе рандомного эл-та обуч. мн-ва
 		net General_Net(settings_net);
 
 		ofstream out_errou_teach("errou_teach.txt");
@@ -344,38 +345,38 @@ int main()
 
 		double errou_teach = 10, errou_test = 10;
 		double e = 0.0001;
-		while (errou_teach > e && number_epoГ±h<100000)
+		while (errou_teach > e && number_epoсh<100000)
 		{
-			for (int j = 0; j < x.size(); j++) // Г±ГЎГ®Г° Г¤Г Г­Г­Г»Гµ Г®ГЎ ГЅГЇГ®ГµГҐ
+			for (int j = 0; j < x.size(); j++) // сбор данных об эпохе
 				epoch_control = epoch_control && epoch[j];
-			if (epoch_control) {	// ГЇГ°Г®ГўГҐГ°ГЄГ  ГЄГ®Г­Г¶Г  ГЅГЇГ®ГµГЁ 
-				for (int j = 0; j < x.size(); j++) // Г®ГІГЄГ ГІГ»ГўГ ГҐГІ Г¤Г Г­Г­Г»ГҐ Г®ГЎ ГЅГЇГ®ГµГҐ
+			if (epoch_control) {	// проверка конца эпохи 
+				for (int j = 0; j < x.size(); j++) // откатывает данные об эпохе
 					epoch[j] = false;
-				number_epoГ±h++;
+				number_epoсh++;
 				errou_teach = 0;
-				for (int j = 0; j < x.size(); j++) // ГўГ»Г·ГЁГ±Г«ГҐГ­ГЁГҐ Г®ГёГЁГЎГЄГЁ
+				for (int j = 0; j < x.size(); j++) // вычисление ошибки
 				{
 					errou_teach = errou_teach + General_Net.functionError(General_Net.startnet(x[j]), d[j]);
 				}
-				if (number_epoГ±h % 20 == 0 || number_epoГ±h < 30 || errou_teach < e + e) { //ГўГ»ГўГ®Г¤ Г®ГёГЁГЎГЄГЁ/ГіГ±Г«Г®ГўГЁГї
-					cout << number_epoГ±h << " == " << errou_teach << endl;
-					out_errou_teach << number_epoГ±h << " " << errou_teach << endl;
+				if (number_epoсh % 20 == 0 || number_epoсh < 30 || errou_teach < e + e) { //вывод ошибки/условия
+					cout << number_epoсh << " == " << errou_teach << endl;
+					out_errou_teach << number_epoсh << " " << errou_teach << endl;
 					errou_test = 0;
 					for (int j = 0; j < test.size(); j++)
 					{
 						errou_test = errou_test + General_Net.functionError(General_Net.startnet(test[j]), test_d[j]);
 					}
-					cout << number_epoГ±h << " test== " << errou_test << endl;
-					out_errou_test << number_epoГ±h << " " << errou_test << endl;
+					cout << number_epoсh << " test== " << errou_test << endl;
+					out_errou_test << number_epoсh << " " << errou_test << endl;
 
 				}
-				if (number_epoГ±h % 200 == 0 || errou_teach <= e + e) { // Г±Г®ГµГ°Г Г­ГҐГ­ГЁГҐ ГўГҐГ±Г®Гў/ГіГ±Г«Г®ГўГЁГї
+				if (number_epoсh % 200 == 0 || errou_teach <= e + e) { // сохранение весов/условия
 					General_Net.save();
 				}
 			}
 
 			epoch_control = true;
-			random_key = rand() % x.size(); // ГўГ»ГЎГ®Г° Г°Г Г­Г¤Г®Г¬Г­Г®ГЈГ® ГЅГ«-ГІГ  Г®ГЎГіГ·. Г¬Г­-ГўГ 
+			random_key = rand() % x.size(); // выбор рандомного эл-та обуч. мн-ва
 			General_Net.teach(x[random_key], d[random_key]);
 			epoch[random_key] = true;
 
