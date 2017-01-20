@@ -170,14 +170,6 @@ public:
 			layers.push_back(a);
 		}
 	}
-	double functionError(vector<double> y, vector<double> d) {
-		double errorf = 0;
-		for (int i = 0; i < y.size(); i++)
-		{
-			errorf = errorf + (y[i] - d[i]) * (y[i] - d[i]);
-		}
-		return errorf / 2;
-	}
 	vector<double> startnet(vector<double> x) { // запуск
 		for (int i = 0; i<config[0]; i++) {
 			x = layers[i].actF(x);
@@ -186,6 +178,52 @@ public:
 		return x;
 	}
 	//	матрица дельт для всех нейронов
+	double teach(vector<double> x, vector<double> d) {
+		vector<double> y = startnet(x);
+		vector<vector<double>> delta = deltaM(d);
+		double alfa = golden_section(delta, x, d);
+		correct(delta, alfa, x);
+		return (functionError(y, d));
+	}
+	vector<vector<vector<double>>> save() {
+		vector<vector<vector<double>>> W;
+		ofstream outs("saveW.txt");
+		for (int i = 0; i < config[0]; i++)
+		{
+			vector<vector<double>> a = layers[i].set_MatrixW();
+			W.push_back(a);
+		}
+		for (int i = 0; i < config.size(); i++) {
+			outs << config[i] << " ";
+		}
+		outs << endl;
+		for (int i = 0; i < W.size(); i++) {
+			for (int j = 0; j < W[i].size(); j++) {
+				for (int k = 0; k < W[i][j].size(); k++)
+					outs << W[i][j][k] << " ";
+				outs << endl;
+			}
+		}
+		outs.close();
+		return(W);
+	}
+	int teaching(vector<double> x, vector<double> d){
+
+
+	}
+private:
+	int kol_sloev;
+	vector<int> config;
+	vector<layer> layers;
+
+	double functionError(vector<double> y, vector<double> d) {
+		double errorf = 0;
+		for (int i = 0; i < y.size(); i++)
+		{
+			errorf = errorf + (y[i] - d[i]) * (y[i] - d[i]);
+		}
+		return errorf / 2;
+	}
 	vector<vector<double>> deltaM(vector<double> d) {
 		//	определяем дельты на последнем слое
 		vector<double> deltalay;
@@ -259,43 +297,7 @@ public:
 		}
 		return (a + b) / 2;
 	}
-	double teach(vector<double> x, vector<double> d) {
-		vector<double> y = startnet(x);
-
-		vector<vector<double>> delta = deltaM(d);
-
-		double alfa = golden_section(delta, x, d);
-		correct(delta, alfa, x);
-		return (functionError(y, d));
-		////////!!!
-	}
-	vector<vector<vector<double>>> save() {
-		vector<vector<vector<double>>> W;
-		ofstream outs("saveW.txt");
-		for (int i = 0; i < config[0]; i++)
-		{
-			vector<vector<double>> a = layers[i].set_MatrixW();
-			W.push_back(a);
-		}
-		for (int i = 0; i < config.size(); i++) {
-			outs << config[i] << " ";
-		}
-		outs << endl;
-		for (int i = 0; i < W.size(); i++) {
-			for (int j = 0; j < W[i].size(); j++) {
-				for (int k = 0; k < W[i][j].size(); k++)
-					outs << W[i][j][k] << " ";
-				outs << endl;
-			}
-		}
-		outs.close();
-		return(W);
-	}
-
-private:
-	int kol_sloev;
-	vector<int> config;
-	vector<layer> layers;
+	
 };
 
 int main()
