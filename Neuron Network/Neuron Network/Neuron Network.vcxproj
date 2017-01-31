@@ -113,7 +113,7 @@
     <ClCompile Include="Layer.cpp" />
     <ClCompile Include="Net.cpp" />
     <ClCompile Include="Neuron.cpp" />
-    <ClCompile Include="perceptron.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Layer.h" />
