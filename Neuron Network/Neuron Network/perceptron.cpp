@@ -234,7 +234,52 @@ public:
 		return(W);
 	}
 	
-	int teaching(vector<double> x, vector<double> d){
+	int teaching(vector<vector<double>> x, vector<vector<double>> d, double e = 0.01){
+		
+		int number_epoch = 0; 
+		int	random_key = 0; 
+		vector<bool> epochControlVector(x.size(), false);
+		double epochControl = true;
+		ofstream outErrouTeach("errou_teach.txt");
+		//ofstream out_errou_test("errou_test.txt");
+		//double errou_test = 10;
+		double errou_teach = 10;
+
+		while (errou_teach > e && number_epoch<10000){
+			for (int j = 0; j < x.size(); j++) 
+				epochControl = epochControl && epochControlVector[j];
+			if (epochControl) {	
+				for (int j = 0; j < x.size(); j++) 
+					epochControlVector[j] = false;
+				number_epoch++;
+				errou_teach = 0;
+				for (int j = 0; j < x.size(); j++) 
+				{
+					errou_teach = errou_teach + functionError(startNet(x[j]), d[j]);
+				}
+				if (number_epoch % 20 == 0 || number_epoch < 30 || errou_teach < e + e) { 
+					cout << number_epoch << " == " << errou_teach << endl;
+					outErrouTeach << number_epoch << " " << errou_teach << endl;
+					/*errou_test = 0;
+					for (int j = 0; j < test.size(); j++)
+					{
+						errou_test = errou_test + functionError(startNet(test[j]), test_d[j]);
+					}
+					cout << number_epoch << " test== " << errou_test << endl;
+					out_errou_test << number_epoch << " " << errou_test << endl;
+					*/
+				}
+				if (number_epoch % 200 == 0 || errou_teach <= e + e) { 
+					save();
+				}
+			}
+			epochControl = true;
+			random_key = rand() % x.size();
+			teach(x[random_key], d[random_key]);
+			epochControlVector[random_key] = true;
+		}
+		outErrouTeach.close();
+		save();
 		return (0);
 	}
 
@@ -322,28 +367,17 @@ private:
 int main()
 {
 	vector<int> settings_net = { 2,1,6,1 }; // настройки сети
-	vector<bool> epoch;// 
-	double epoch_control = true;
-	//	
-	vector<vector<double>> test = { { 0.022 },{ 0.067 },{ 0.125 },{ 0.16 },{ 0.22 },{ 0.27 },{ 0.32 },{ 0.37 },{ 0.40 },{ 0.469 },{ 0.518 },{ 0.57 } };
-	vector<vector<double>> test_d;
-	for (int i = 0; i < test.size(); i++) {
-		vector<double> a = { sin(10 * test[i][0]) / 2 };
-		test_d.push_back(a);
-	}
 	vector<vector<double>> x = { { 0.045 },{ 0.106 },{ 0.14 },{ 0.2 },{ 0.24 },{ 0.3 },{ 0.35 },{ 0.39 },{ 0.43 },{ 0.495 },{ 0.54 },{ 0.61 } };
 	vector<vector<double>> d;
 	for (int i = 0; i < x.size(); i++) {
 		vector<double> a = { sin(10 * x[i][0]) / 2 };
 		d.push_back(a);
-		epoch.push_back(false);
 	}
-	// 
 	int start_control;
 	cout << "1 - start with teacing"<< endl <<" 0 - start without teacing"<<endl;
 	cin >> start_control;
 
-	if (start_control == 0) { //
+	if (start_control == 0) { 
 		Net General_Net(true);
 		ofstream out("rez.txt");
 		for (double i = 0.01; i <0.63; i = i + 0.01) {
@@ -354,62 +388,10 @@ int main()
 		out.close();
 
 	}
-	else {
-		int number_epoch = 0; //
-		int	random_key = 0; // 
-		Net general_Net(settings_net);
-
-		ofstream out_errou_teach("errou_teach.txt");
-		ofstream out_errou_test("errou_test.txt");
-
-		double errou_teach = 10, errou_test = 10;
-		double e = 0.01;
-		while (errou_teach > e && number_epoch<100000)
-		{
-			for (int j = 0; j < x.size(); j++) // 
-				epoch_control = epoch_control && epoch[j];
-			if (epoch_control) {	// 
-				for (int j = 0; j < x.size(); j++) // 
-					epoch[j] = false;
-				number_epoch++;
-				errou_teach = 0;
-				for (int j = 0; j < x.size(); j++) // 
-				{
-					errou_teach = errou_teach + general_Net.functionError(general_Net.startNet(x[j]), d[j]);
-				}
-				if (number_epoch % 20 == 0 || number_epoch < 30 || errou_teach < e + e) { //
-					cout << number_epoch << " == " << errou_teach << endl;
-					out_errou_teach << number_epoch << " " << errou_teach << endl;
-					errou_test = 0;
-					for (int j = 0; j < test.size(); j++)
-					{
-						errou_test = errou_test + general_Net.functionError(general_Net.startNet(test[j]), test_d[j]);
-					}
-					cout << number_epoch << " test== " << errou_test << endl;
-					out_errou_test << number_epoch << " " << errou_test << endl;
-
-				}
-				if (number_epoch % 200 == 0 || errou_teach <= e + e) { // 
-					general_Net.save();
-				}
-			}
-
-			epoch_control = true;
-			random_key = rand() % x.size(); // 
-			general_Net.teach(x[random_key], d[random_key]);
-			epoch[random_key] = true;
-
-		}
-		out_errou_teach.close();
-
-		out_errou_teach.open("rez.txt");
-		for (double i = 0.01; i < 0.63; i = i + 0.01) {
-			x[0][0] = i;
-			d[0] = general_Net.startNet(x[0]);
-			out_errou_teach << d[0][0] << endl;
-		}
+	else if (start_control == 1){
+		Net generalNet(settings_net);
+		generalNet.teaching(x, d);
 	}
-
 
 	return 0;
 }
