@@ -186,52 +186,11 @@ public:
 		}
 	}
 	
-	double functionError(vector<double> y, vector<double> d) {
-		double errorf = 0;
-		for (int i = 0; i < y.size(); i++)
-		{
-			errorf = errorf + (y[i] - d[i]) * (y[i] - d[i]);
-		}
-		return errorf / 2;
-	}
-	
 	vector<double> startNet(vector<double> x) { 
 		for (int i = 0; i<config[0]; i++) {
 			x = layers[i].actF(x);
 		}
-
 		return x;
-	}
-	
-	double teach(vector<double> x, vector<double> d) {
-		vector<double> y = startNet(x);
-		vector<vector<double>> delta = deltaM(d);
-		double alfa = goldenSection(delta, x, d);
-		correct(delta, alfa, x);
-		return (functionError(y, d));
-	}
-	
-	vector<vector<vector<double>>> save() {
-		vector<vector<vector<double>>> W;
-		ofstream outs("saveW.txt");
-		for (int i = 0; i < config[0]; i++)
-		{
-			vector<vector<double>> a = layers[i].getMatrixW();
-			W.push_back(a);
-		}
-		for (int i = 0; i < config.size(); i++) {
-			outs << config[i] << " ";
-		}
-		outs << endl;
-		for (int i = 0; i < W.size(); i++) {
-			for (int j = 0; j < W[i].size(); j++) {
-				for (int k = 0; k < W[i][j].size(); k++)
-					outs << W[i][j][k] << " ";
-				outs << endl;
-			}
-		}
-		outs.close();
-		return(W);
 	}
 	
 	int teaching(vector<vector<double>> x, vector<vector<double>> d, double e = 0.01){
@@ -362,6 +321,46 @@ private:
 		return (a + b) / 2;
 	}
 	
+	double teach(vector<double> x, vector<double> d) {
+		vector<double> y = startNet(x);
+		vector<vector<double>> delta = deltaM(d);
+		double alfa = goldenSection(delta, x, d);
+		correct(delta, alfa, x);
+		return (functionError(y, d));
+	}
+	
+	vector<vector<vector<double>>> save() {
+		vector<vector<vector<double>>> W;
+		ofstream outs("saveW.txt");
+		for (int i = 0; i < config[0]; i++)
+		{
+			vector<vector<double>> a = layers[i].getMatrixW();
+			W.push_back(a);
+		}
+		for (int i = 0; i < config.size(); i++) {
+			outs << config[i] << " ";
+		}
+		outs << endl;
+		for (int i = 0; i < W.size(); i++) {
+			for (int j = 0; j < W[i].size(); j++) {
+				for (int k = 0; k < W[i][j].size(); k++)
+					outs << W[i][j][k] << " ";
+				outs << endl;
+			}
+		}
+		outs.close();
+		return(W);
+	}
+	
+	double functionError(vector<double> y, vector<double> d) {
+		double errorf = 0;
+		for (int i = 0; i < y.size(); i++)
+		{
+			errorf = errorf + (y[i] - d[i]) * (y[i] - d[i]);
+		}
+		return errorf / 2;
+	}
+	
 };
 
 int main()
@@ -369,15 +368,15 @@ int main()
 	vector<int> settings_net = { 2,1,6,1 }; // настройки сети
 	vector<vector<double>> x = { { 0.045 },{ 0.106 },{ 0.14 },{ 0.2 },{ 0.24 },{ 0.3 },{ 0.35 },{ 0.39 },{ 0.43 },{ 0.495 },{ 0.54 },{ 0.61 } };
 	vector<vector<double>> d;
-	for (int i = 0; i < x.size(); i++) {
-		vector<double> a = { sin(10 * x[i][0]) / 2 };
+	for (auto arg : x) {
+		vector<double> a = { sin(10 * arg[0]) / 2 };
 		d.push_back(a);
 	}
-	int start_control;
-	cout << "1 - start with teacing"<< endl <<" 0 - start without teacing"<<endl;
+	bool start_control;
+	cout << "0 - start with teacing"<< endl <<" 1 - start without teacing"<<endl;
 	cin >> start_control;
 
-	if (start_control == 0) { 
+	if (start_control) { 
 		Net General_Net(true);
 		ofstream out("rez.txt");
 		for (double i = 0.01; i <0.63; i = i + 0.01) {
@@ -388,7 +387,7 @@ int main()
 		out.close();
 
 	}
-	else if (start_control == 1){
+	else{
 		Net generalNet(settings_net);
 		generalNet.teaching(x, d);
 	}
