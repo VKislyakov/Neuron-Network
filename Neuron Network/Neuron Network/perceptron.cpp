@@ -363,7 +363,7 @@ int main()
 		ofstream out_errou_test("errou_test.txt");
 
 		double errou_teach = 10, errou_test = 10;
-		double e = 0.0001;
+		double e = 0.01;
 		while (errou_teach > e && number_epoch<100000)
 		{
 			for (int j = 0; j < x.size(); j++) // 

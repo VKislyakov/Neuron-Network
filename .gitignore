@@ -243,3 +243,7 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+/Neuron Network/Neuron Network/saveW.txt
+/Neuron Network/Neuron Network/errou_teach.txt
+/Neuron Network/Neuron Network/errou_test.txt
+/Neuron Network/Neuron Network/rez.txt
