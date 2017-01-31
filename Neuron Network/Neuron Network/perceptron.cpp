@@ -355,7 +355,7 @@ int main()
 
 	}
 	else {
-		int number_epo�h = 0; //
+		int number_epoch = 0; //
 		int	random_key = 0; // 
 		Net general_Net(settings_net);
 
@@ -364,32 +364,32 @@ int main()
 
 		double errou_teach = 10, errou_test = 10;
 		double e = 0.0001;
-		while (errou_teach > e && number_epo�h<100000)
+		while (errou_teach > e && number_epoch<100000)
 		{
 			for (int j = 0; j < x.size(); j++) // 
 				epoch_control = epoch_control && epoch[j];
 			if (epoch_control) {	// 
 				for (int j = 0; j < x.size(); j++) // 
 					epoch[j] = false;
-				number_epo�h++;
+				number_epoch++;
 				errou_teach = 0;
 				for (int j = 0; j < x.size(); j++) // 
 				{
 					errou_teach = errou_teach + general_Net.functionError(general_Net.startNet(x[j]), d[j]);
 				}
-				if (number_epo�h % 20 == 0 || number_epo�h < 30 || errou_teach < e + e) { //
-					cout << number_epo�h << " == " << errou_teach << endl;
-					out_errou_teach << number_epo�h << " " << errou_teach << endl;
+				if (number_epoch % 20 == 0 || number_epoch < 30 || errou_teach < e + e) { //
+					cout << number_epoch << " == " << errou_teach << endl;
+					out_errou_teach << number_epoch << " " << errou_teach << endl;
 					errou_test = 0;
 					for (int j = 0; j < test.size(); j++)
 					{
 						errou_test = errou_test + general_Net.functionError(general_Net.startNet(test[j]), test_d[j]);
 					}
-					cout << number_epo�h << " test== " << errou_test << endl;
-					out_errou_test << number_epo�h << " " << errou_test << endl;
+					cout << number_epoch << " test== " << errou_test << endl;
+					out_errou_test << number_epoch << " " << errou_test << endl;
 
 				}
-				if (number_epo�h % 200 == 0 || errou_teach <= e + e) { // 
+				if (number_epoch % 200 == 0 || errou_teach <= e + e) { // 
 					general_Net.save();
 				}
 			}
