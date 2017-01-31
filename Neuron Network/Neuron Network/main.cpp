@@ -21,15 +21,14 @@ int main()
 	cin >> start_control;
 
 	if (start_control) { 
-		Net General_Net(true);
+		Net generalNet(true);
 		ofstream out("rez.txt");
 		for (double i = 0.01; i <0.63; i = i + 0.01) {
 			x[0][0] = i;
-			d[0] = General_Net.startNet(x[0]);
+			d[0] = generalNet.startNet(x[0]);
 			out << d[0][0] << endl;
 		}
 		out.close();
-
 	}
 	else{
 		Net generalNet(settings_net);
