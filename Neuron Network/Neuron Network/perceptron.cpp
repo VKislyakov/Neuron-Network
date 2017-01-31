@@ -26,11 +26,11 @@ public:
 		return(int(weights.size()));
 	}
 
-	vector<double> setAllWeights() { // 
+	vector<double> getAllWeights() { // 
 		return weights;
 	}
 
-	double setElemWeight(int number) {
+	double getElemWeight(int number) {
 		return(weights[number]);
 	}
 
@@ -62,13 +62,16 @@ public:
 	}
 	
 	void setNewVectorWeights(vector<double> W) {
-		weights = W;
-	}
+			weights = W;
+		}
 
 private:
 	vector<double> weights;
 	double sum;
 	double F;
+
+	
+
 };
 
 class Layer {
@@ -111,7 +114,7 @@ public:
 	}
 
 	vector<double> getVectorW(int i) { //
-		return neurons[i].setAllWeights();
+		return neurons[i].getAllWeights();
 	}
 
 	vector<vector<double>> getMatrixW() { //
@@ -234,13 +237,18 @@ public:
 	int teaching(vector<double> x, vector<double> d){
 		return (0);
 	}
+
+	void setLayer(vector<Layer> lay) {
+			layers = lay;
+	}
+
 private:
 	int kol_sloev;
 	vector<int> config;
 	vector<Layer> layers;
 
 	vector<vector<double>> deltaM(vector<double> d) {
-		//	���������� ������ �� ��������� ����
+	
 		vector<double> deltalay;
 		vector<vector<double>> delta(config[0]);
 		vector<double> activf = layers[config[0] - 1].actF();
@@ -248,15 +256,14 @@ private:
 			deltalay.push_back((activf[i] - d[i])*(1 - activf[i] * activf[i]));
 		}
 		delta[config[0] - 1] = deltalay;
-		//	��������� �������� ������ ���������� ����
-		//	���������� ������ �� ��������� �����
+		
 		vector<vector<double>> matrix_w;
-		for (int lay = config[0] - 2; lay >= 0; lay--) {// lay ����� ����
+		for (int lay = config[0] - 2; lay >= 0; lay--) {
 			deltalay.clear();
 			activf.clear();
 			matrix_w.clear();
-			matrix_w = layers[lay + 1].getMatrixW();// ���� �������� ���� lay+1
-			vector<double> activf = layers[lay].actF();// �������� �������� ���� lay
+			matrix_w = layers[lay + 1].getMatrixW();
+			vector<double> activf = layers[lay].actF();
 			double sum_del_w;
 			for (int j = 0; j<config[lay + 2]; j++) {
 				sum_del_w = 0;
@@ -267,7 +274,6 @@ private:
 			}
 			delta[lay] = deltalay;
 		}
-		//	��������� �������� ������
 		return delta;
 	}
 	
@@ -276,10 +282,6 @@ private:
 		for (int i = 1; i<config[0]; i++) {
 			layers[i].correct(delta[i], layers[i - 1].actF(), alfa);
 		}
-	}
-	
-	void setLayer(vector<Layer> lay) {
-		layers = lay;
 	}
 	
 	double goldenSection(vector<vector<double>> delta, vector<double> x, vector<double> d) {
