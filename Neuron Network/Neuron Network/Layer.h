@@ -8,6 +8,7 @@
 
 using namespace std;
 class Layer {
+
 public:
 	Layer(int early_kol_neu, int kol_neu);
 

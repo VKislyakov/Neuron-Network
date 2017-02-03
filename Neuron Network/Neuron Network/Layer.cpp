@@ -31,7 +31,7 @@ vector<double> Layer::actF() {
 }
 
 int Layer::correct(vector<double> deltw, vector<double> y, double alfa) {
-	for (decltype(neurons.size()) i = 0; i<neurons.size(); i++) {
+	for (decltype(neurons.size()) i = 0, sz = neurons.size(); i < sz; i++) {
 		neurons[i].correctWeights(deltw[i], y, alfa);
 	}
 	return 0;
