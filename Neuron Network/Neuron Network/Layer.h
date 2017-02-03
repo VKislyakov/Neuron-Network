@@ -3,7 +3,8 @@
 #ifndef LAYER_H
 #define LAYER_H
 #include "Neuron.h"
-
+#include <vector>
+#include <cmath>
 
 using namespace std;
 class Layer {

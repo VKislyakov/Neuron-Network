@@ -17,7 +17,7 @@ public:
 
 	Net(vector<vector<vector<double>>> wieght);
 
-	Net(bool g);
+	Net(bool g); // обеспецивает задание архитектуры и весов из файла,
 
 	vector<double> startNet(vector<double> x);
 

@@ -17,10 +17,6 @@ Neuron::Neuron(vector<double> verton_weight) {
 	F = 0;
 }
 
-int Neuron::getKolWeight() {
-	return(int(weights.size()));
-}
-
 vector<double> Neuron::getAllWeights() { // 
 	return weights;
 }
@@ -31,7 +27,7 @@ double Neuron::getElemWeight(int number) {
 
 double Neuron::Sum(vector<double> x) {
 	sum = weights[weights.size() - 1];
-	for (int i = 0; i < weights.size() - 1; i++)
+	for (decltype(weights.size()) i = 0; i < weights.size() - 1; i++)
 		sum = sum + weights[i] * x[i];
 	return sum;
 }
@@ -51,7 +47,7 @@ double Neuron::ActF() {
 }
 
 void Neuron::correctWeights(double deltaW, vector<double> y, double alfa) {
-	for (int i = 0; i < weights.size() - 1; i++)
+	for (decltype(weights.size()) i = 0; i < weights.size() - 1; i++)
 		weights[i] = weights[i] - deltaW * y[i] * alfa;
 	weights[weights.size() - 1] = weights[weights.size() - 1] - deltaW * alfa;
 }

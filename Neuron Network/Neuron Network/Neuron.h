@@ -7,12 +7,14 @@ using namespace std;
 
 class Neuron
 {
+private:
+	vector<double> weights;
+	double sum;
+	double F;
 public:
 	Neuron(int number_weight);
 
 	Neuron(vector<double> verton_weight);
-
-	int getKolWeight();
 
 	vector<double> getAllWeights();
 
@@ -30,10 +32,7 @@ public:
 
 	void setNewVectorWeights(vector<double> W);
 
-private:
-	vector<double> weights;
-	double sum;
-	double F;
+
 };
 
 #endif // !NEURON_H

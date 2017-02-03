@@ -17,7 +17,7 @@ int main()
 		d.push_back(a);
 	}
 	bool start_control;
-	cout << "0 - start with teacing"<< endl <<" 1 - start without teacing"<<endl;
+	cout << "0 - start with teacing222"<< endl <<" 1 - start without teacing"<<endl;
 	cin >> start_control;
 
 	if (start_control) { 

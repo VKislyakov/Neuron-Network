@@ -10,15 +10,14 @@ Net::Net(vector<int> conf) {
 
 Net::Net(vector<vector<vector<double>>> wieght)
 {
-	for (int i = 1; i <= wieght.size(); i++) {
-		Layer a(wieght[i]);
+	for (auto elemWieght: wieght) {
+		Layer a(elemWieght);
 		layers.push_back(a);
 	}
 }
 
 Net::Net(bool g)
 {
-	vector<vector<vector<double>>> wieght;
 	ifstream in("saveW.txt");
 	vector<int> conf;
 	int read;
@@ -30,8 +29,10 @@ Net::Net(bool g)
 		conf.push_back(read);
 	}
 	config = conf;
-	vector<double> neu;
+	vector<vector<vector<double>>> wieght;
 	vector<vector<double>> lay;
+	vector<double> neu;
+	
 	double w;
 	for (int i = 0; i < conf[0]; i++) {
 		lay.clear();
@@ -46,9 +47,8 @@ Net::Net(bool g)
 		}
 		wieght.push_back(lay);
 	}
-
-	for (int i = 0; i < wieght.size(); i++) {
-		Layer a(wieght[i]);
+	for (auto elementWieght:wieght) {
+		Layer a(elementWieght);
 		layers.push_back(a);
 	}
 }
@@ -67,37 +67,28 @@ int Net::teaching(vector<vector<double>> x, vector<vector<double>> d, double e) 
 	vector<bool> epochControlVector(x.size(), false);
 	double epochControl = true;
 	ofstream outErrouTeach("errou_teach.txt");
-	//ofstream out_errou_test("errou_test.txt");
-	//double errou_test = 10;
-	double errou_teach = 10;
+	double errou_teach = 10; // задаем переменную для хранения ошибки на обучающем мн-ве, должна быть больше переменной "е"
 
 	while (errou_teach > e && number_epoch<10000) {
-		for (int j = 0; j < x.size(); j++)
-			epochControl = epochControl && epochControlVector[j];
+		for (auto elemEpContVect: epochControlVector)
+			epochControl = epochControl && elemEpContVect;
 		if (epochControl) {
-			for (int j = 0; j < x.size(); j++)
-				epochControlVector[j] = false;
+			for (auto &elemEpContVect : epochControlVector)
+				elemEpContVect = false;
 			number_epoch++;
 			errou_teach = 0;
-			for (int j = 0; j < x.size(); j++)
+			for (decltype(x.size()) j = 0; j < x.size(); j++)
 			{
 				errou_teach = errou_teach + functionError(startNet(x[j]), d[j]);
 			}
 			if (number_epoch % 20 == 0 || number_epoch < 30 || errou_teach < e + e) {
 				cout << number_epoch << " == " << errou_teach << endl;
 				outErrouTeach << number_epoch << " " << errou_teach << endl;
-				/*errou_test = 0;
-				for (int j = 0; j < test.size(); j++)
-				{
-				errou_test = errou_test + functionError(startNet(test[j]), test_d[j]);
+				if (number_epoch % 200 == 0){
+					save();
 				}
-				cout << number_epoch << " test== " << errou_test << endl;
-				out_errou_test << number_epoch << " " << errou_test << endl;
-				*/
 			}
-			if (number_epoch % 200 == 0 || errou_teach <= e + e) {
-				save();
-			}
+			
 		}
 		epochControl = true;
 		random_key = rand() % x.size();
@@ -133,7 +124,7 @@ vector<vector<double>> Net::deltaM(vector<double> d) {
 			double sum_del_w;
 			for (int j = 0; j<config[lay + 2]; j++) {
 				sum_del_w = 0;
-				for (int k = 0; k < matrix_w.size(); k++) {
+				for (decltype(matrix_w.size()) k = 0; k < matrix_w.size(); k++) {
 					sum_del_w = sum_del_w + delta[lay + 1][k] * matrix_w[k][j];
 				}
 				deltalay.push_back(sum_del_w*(1 - activf[j] * activf[j]));
@@ -199,13 +190,13 @@ vector<vector<vector<double>>> Net::save() {
 			vector<vector<double>> a = layers[i].getMatrixW();
 			W.push_back(a);
 		}
-		for (int i = 0; i < config.size(); i++) {
+		for (decltype(config.size()) i = 0; i < config.size(); i++) {
 			outs << config[i] << " ";
 		}
 		outs << endl;
-		for (int i = 0; i < W.size(); i++) {
-			for (int j = 0; j < W[i].size(); j++) {
-				for (int k = 0; k < W[i][j].size(); k++)
+		for (decltype(W.size()) i = 0; i < W.size(); i++) {
+			for (decltype(W[0].size()) j = 0; j < W[i].size(); j++) {
+				for (decltype(W[0][0].size()) k = 0; k < W[i][j].size(); k++)
 					outs << W[i][j][k] << " ";
 				outs << endl;
 			}
@@ -216,8 +207,7 @@ vector<vector<vector<double>>> Net::save() {
 
 double Net::functionError(vector<double> y, vector<double> d) {
 		double errorf = 0;
-		for (int i = 0; i < y.size(); i++)
-		{
+		for (decltype(y.size()) i = 0; i < y.size(); i++){
 			errorf = errorf + (y[i] - d[i]) * (y[i] - d[i]);
 		}
 		return errorf / 2;

@@ -10,7 +10,7 @@ Layer::Layer(int early_kol_neu, int kol_neu) {
 }
 
 Layer::Layer(vector<vector<double>> W) {
-	for (int i = 0; i < W.size(); i++) {
+	for (decltype(W.size()) i = 0; i < W.size(); i++) {
 		Neuron a(W[i]);
 		neurons.push_back(a);
 		activ_f.push_back(0);
@@ -19,7 +19,7 @@ Layer::Layer(vector<vector<double>> W) {
 }
 
 vector<double> Layer::actF(vector<double> X) {
-	for (int i = 0; i < neurons.size(); i++) {
+	for (decltype(neurons.size()) i = 0; i < neurons.size(); i++) {
 		activ_f[i] = neurons[i].ActF(X);
 		sum_s[i] = neurons[i].Sum();
 	}
@@ -31,7 +31,7 @@ vector<double> Layer::actF() {
 }
 
 int Layer::correct(vector<double> deltw, vector<double> y, double alfa) {
-	for (int i = 0; i<neurons.size(); i++) {
+	for (decltype(neurons.size()) i = 0; i<neurons.size(); i++) {
 		neurons[i].correctWeights(deltw[i], y, alfa);
 	}
 	return 0;
@@ -43,7 +43,7 @@ vector<double> Layer::getVectorW(int i) { //
 
 vector<vector<double>> Layer::getMatrixW() { //
 	vector<vector<double>> matrix;
-	for (int i = 0; i<neurons.size(); i++) {
+	for (decltype(neurons.size()) i = 0; i<neurons.size(); i++) {
 		matrix.push_back(getVectorW(i));
 	}
 	return matrix;
