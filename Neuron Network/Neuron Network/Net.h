@@ -13,17 +13,19 @@ using namespace std;
 class Net
 {
 public:
-	Net(vector<int> conf);
 
-	Net(vector<vector<vector<double>>> wieght);
+	Net(vector<int> conf); // генерирует сеть с рандомными весами
 
-	Net(bool g); // обеспецивает задание архитектуры и весов из файла,
+	Net(vector<vector<vector<double>>> wieght); // генерирует сень на основе трехмерной матрицы весов
 
-	vector<double> startNet(vector<double> x);
+//!!!! исправить на получение имени или пути к файлу
+	Net(bool g); // генерирует сеть из файла,
 
-	int teaching(vector<vector<double>> x, vector<vector<double>> d, double e = 0.01);
+	vector<double> startNet(vector<double> x); // запускает сеть для вектора х
 
-	void setLayer(vector<Layer> lay);
+	int teaching(vector<vector<double>> x, vector<vector<double>> d, double e = 0.01); // обучает сеть до заданной точности, только по обучающему множеству
+
+	void setLayer(vector<Layer> lay); // задает новые веса для всех слоев
 
 private:
 	int kol_sloev;
@@ -34,7 +36,7 @@ private:
 
 	void correct(vector<vector<double>> delta, double alfa, vector<double> x);
 
-	double goldenSection(vector<vector<double>> delta, vector<double> x, vector<double> d);
+	double goldenSection(vector<vector<double>> delta, vector<double> x, vector<double> d); 
 
 	double teach(vector<double> x, vector<double> d);
 

@@ -1,7 +1,6 @@
 #include "Net.h"
 
-Net::Net(vector<int> conf) {
-	config = conf;
+Net::Net(vector<int> conf):config(conf){
 	for (int i = 1; i <= config[0]; i++) {
 		Layer a(config[i], config[i + 1]);
 		layers.push_back(a);
