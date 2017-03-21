@@ -16,6 +16,8 @@ public:
 
 	Neuron(vector<double> verton_weight);
 
+	virtual ~Neuron();
+
 	vector<double> getAllWeights();
 
 	double getElemWeight(int number);

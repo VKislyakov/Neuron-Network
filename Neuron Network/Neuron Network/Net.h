@@ -27,6 +27,8 @@ public:
 
 	void setLayer(vector<Layer> lay); // задает новые веса для всех слоев
 
+	virtual ~Net();
+
 private:
 	int kol_sloev;
 	vector<int> config;

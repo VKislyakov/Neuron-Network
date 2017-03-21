@@ -1,4 +1,5 @@
 #include "Net.h"
+#include "DataSet.h"
 #include <vector>
 #include <iostream>
 #include <iterator>
@@ -7,8 +8,9 @@
 #include <cmath>
 using namespace std;
 
-int main()
-{
+int main(int argc, char* argv[]){
+
+	/*
 	vector<int> settings_net = { 2,1,6,1 }; // настройки сети
 	vector<vector<double>> x = { { 0.045 },{ 0.106 },{ 0.14 },{ 0.2 },{ 0.24 },{ 0.3 },{ 0.35 },{ 0.39 },{ 0.43 },{ 0.495 },{ 0.54 },{ 0.61 } };
 	vector<vector<double>> d;
@@ -34,6 +36,11 @@ int main()
 		Net generalNet(settings_net);
 		generalNet.teaching(x, d);
 	}
+	*/
+
+	DataSet data;
+	data.createDataFile();
+
 
 	return 0;
 }

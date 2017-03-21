@@ -1,5 +1,8 @@
 #include "Layer.h"
 
+Layer::~Layer() {
+}
+
 Layer::Layer(int early_kol_neu, int kol_neu) {
 	for (int i = 0; i < kol_neu; i++) {
 		Neuron a(early_kol_neu);

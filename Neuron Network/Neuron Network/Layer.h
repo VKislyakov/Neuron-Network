@@ -10,9 +10,12 @@ using namespace std;
 class Layer {
 
 public:
+
 	Layer(int early_kol_neu, int kol_neu);
 
 	Layer(vector<vector<double>> W);
+
+	virtual ~Layer();
 
 	vector<double> actF(vector<double> X);
 
@@ -23,6 +26,7 @@ public:
 	vector<double> getVectorW(int i);
 
 	vector<vector<double>> getMatrixW();
+
 private:
 	vector<Neuron> neurons;
 	vector<double> activ_f;

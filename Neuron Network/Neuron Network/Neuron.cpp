@@ -1,7 +1,3 @@
-#ifndef Neuron
-
-#endif // !Neuron
-
 #include "Neuron.h"
 
 Neuron::Neuron(int number_weight) {
@@ -15,6 +11,9 @@ Neuron::Neuron(vector<double> verton_weight) {
 	weights = verton_weight;
 	sum = 0;
 	F = 0;
+}
+
+Neuron::~Neuron() {
 }
 
 vector<double> Neuron::getAllWeights() { // 
