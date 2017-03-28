@@ -2,39 +2,60 @@
 
 #ifndef DATASET_H
 #define DATASET_H
+#include <map>
 #include <vector>
 #include <string>
+#include <iterator>
 #include <iostream>
 #include <fstream>
+#include <boost/filesystem.hpp>
+using namespace boost::filesystem;
 using namespace std;
 
-class DataSet
-{
+class DataSet;
+
+//---------------------------------------------------------
+
+class Bloc {
+
+public:
+	friend DataSet;
+
+	Bloc();
+
+	virtual ~Bloc();
+
+	Bloc(string path); /*	формирует Bloc по пути из одного файла, если он существует,
+					  иначе из мн-ва файлов по данному пути добавляя " 01"," 02" и тд соответсвенно
+						*/
+	void save(string sPath,int numberElem); /* сохраняет блок в указаной папке, например 'diod', а папку класса определяет сама
+											Внимание !!!  если папка класса отсутствует файл не будет сохнанен !!!
+											*/
+private:
+	
+
+	vector<vector<string>> data;
+
+	string answer;
+};
+
+//---------------------------------------------------------
+class DataSet {
 public:
 	DataSet();
 
 	virtual ~DataSet();
 
-	
-
-	/*
-	Создате два файла: с обучающим мн-ом и ответами на него
-	После вызова ожидает: 1) Колл-во вариантов ответов
-						  2) Путь с именем файла в который будет вестись запись
-						  3) Путь к файлу с данными и ответ, пока вметсто файла не введут "END"
-
-	*/
 	void createDataFile();
 
 
 
 private:
-
-
-	vector<vector<double>> trainingData; // обучающие данные
-
-	vector<vector<double>> answerForData; // правильные ответы на данные
+	vector<Bloc> blocSet; // обучающие данные
+	map<string, vector<double>> answerForData; // правильные ответы на данные
 
 };
+
+
 
 #endif // DATASET_H

@@ -3,12 +3,16 @@
 Net::~Net() {
 }
 
+//---------------------------------------------------------
+
 Net::Net(vector<int> conf) :config(conf) {
 	for (int i = 1; i <= config[0]; i++) {
 		Layer a(config[i], config[i + 1]);
 		layers.push_back(a);
 	}
 };
+
+//---------------------------------------------------------
 
 Net::Net(vector<vector<vector<double>>> wieght)
 {
@@ -17,6 +21,8 @@ Net::Net(vector<vector<vector<double>>> wieght)
 		layers.push_back(a);
 	}
 }
+
+//---------------------------------------------------------
 
 Net::Net(bool g)
 {
@@ -55,12 +61,16 @@ Net::Net(bool g)
 	}
 }
 
+//---------------------------------------------------------
+
 vector<double> Net::startNet(vector<double> x) {
 	for (int i = 0; i < config[0]; i++) {
 		x = layers[i].actF(x);
 	}
 	return x;
 }
+
+//---------------------------------------------------------
 
 int Net::teaching(vector<vector<double>> x, vector<vector<double>> d, double e) {
 
@@ -102,9 +112,13 @@ int Net::teaching(vector<vector<double>> x, vector<vector<double>> d, double e) 
 	return (0);
 }
 
+//---------------------------------------------------------
+
 void Net::setLayer(vector<Layer> lay) {
 	layers = lay;
 }
+
+//---------------------------------------------------------
 
 // не коректная функция, производна активационной функции не вызывается, считается по формуле!!! нужно вызывать!!!
 vector<vector<double>> Net::deltaM(vector<double> d) {
@@ -137,12 +151,16 @@ vector<vector<double>> Net::deltaM(vector<double> d) {
 	return delta;
 }
 
+//---------------------------------------------------------
+
 void Net::correct(vector<vector<double>> delta, double alfa, vector<double> x) {
 	layers[0].correct(delta[0], x, alfa);
 	for (int i = 1; i < config[0]; i++) {
 		layers[i].correct(delta[i], layers[i - 1].actF(), alfa);
 	}
 }
+
+//---------------------------------------------------------
 
 double Net::goldenSection(vector<vector<double>> delta, vector<double> x, vector<double> d) {
 	Net minimiNet(config);
@@ -177,6 +195,8 @@ double Net::goldenSection(vector<vector<double>> delta, vector<double> x, vector
 	return (a + b) / 2;
 }
 
+//---------------------------------------------------------
+
 double Net::teach(vector<double> x, vector<double> d) {
 	vector<double> y = startNet(x);
 	vector<vector<double>> delta = deltaM(d);
@@ -184,6 +204,8 @@ double Net::teach(vector<double> x, vector<double> d) {
 	correct(delta, alfa, x);
 	return (functionError(y, d));
 }
+
+//---------------------------------------------------------
 
 vector<vector<vector<double>>> Net::save() {
 	vector<vector<vector<double>>> W;
@@ -208,6 +230,8 @@ vector<vector<vector<double>>> Net::save() {
 	return(W);
 }
 
+//---------------------------------------------------------
+
 double Net::functionError(vector<double> y, vector<double> d) {
 	double errorf = 0;
 	for (decltype(y.size()) i = 0; i < y.size(); i++) {
@@ -216,4 +240,4 @@ double Net::functionError(vector<double> y, vector<double> d) {
 	return errorf / 2;
 }
 
-
+//---------------------------------------------------------
