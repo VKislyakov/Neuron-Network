@@ -13,7 +13,7 @@ using namespace boost::filesystem;
 using namespace std;
 
 class DataSet;
-
+vector<string> getDirectoryAttachments(string dPath);
 //---------------------------------------------------------
 
 class Bloc {
@@ -28,7 +28,7 @@ public:
 	Bloc(string path); /*	формирует Bloc по пути из одного файла, если он существует,
 					  иначе из мн-ва файлов по данному пути добавл€€ " 01"," 02" и тд соответсвенно
 						*/
-	void save(string sPath,int numberElem); /* сохран€ет блок в указаной папке, например 'diod', а папку класса определ€ет сама
+	int save(string sPath); /* сохран€ет блок в указаной папке, например 'diod', а папку класса определ€ет сама
 											¬нимание !!!  если папка класса отсутствует файл не будет сохнанен !!!
 											*/
 private:
@@ -43,12 +43,9 @@ private:
 class DataSet {
 public:
 	DataSet();
-
+	DataSet(string dPath);
+	int save(string savePath);
 	virtual ~DataSet();
-
-	void createDataFile();
-
-
 
 private:
 	vector<Bloc> blocSet; // обучающие данные

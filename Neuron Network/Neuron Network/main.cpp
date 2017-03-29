@@ -45,11 +45,12 @@ int main(int argc, char* argv[]) {
 	string fPath;
 	getline(cin, fPath);
 	//string fPath = "C:\\VKR\\save\\test.txt";
-
+	vector<string> v = getDirectoryAttachments(fPath);
+	vector<double> d(0, v.size());
+	//DataSet aa(fPath);
+	//getline(cin, fPath);
 	
-	
-	
-
+	///aa.save(fPath);
 
 
 	return 0;
