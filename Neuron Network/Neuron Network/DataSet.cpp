@@ -18,9 +18,9 @@ Bloc::~Bloc() {
 }
 //---------------------------------------------------------
 /*	
-	Вспомагалельная функция
-	Возвращает все что есть в папке(имена)
-											*/
+	Auxiliary function.
+	Returns everything in the folder (names).
+*/
 vector<string> getDirectoryAttachments(string dPath) {
 	path p(dPath);
 	vector<string> v;
@@ -178,18 +178,17 @@ DataSet::DataSet(string dPath) {
 //---------------------------------------------------------
 
 int DataSet::save(string savePath) {
-	//for (auto x : blocSet)
-		//x.save(savePath);
+	for(auto blocSet = mapData.begin(); blocSet != mapData.end(); blocSet++)
+		for (auto x : blocSet->second)
+			x.save(savePath);
 	cout << "	Save END	" << endl;
 	return 0;
 }
 
 //---------------------------------------------------------
-/*
-map<vector<double>, vector<Bloc>> DataSet::get_mapData() {
-	map<vector<double>, vector<vector<double>>> mapData;
 
-
+map<vector<double>, vector<Bloc>> DataSet::getData() {
+	return mapData;
 }
-*/
+
 //---------------------------------------------------------
