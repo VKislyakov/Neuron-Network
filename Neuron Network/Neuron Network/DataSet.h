@@ -29,7 +29,7 @@ public:
 					  иначе из мн-ва файлов по данному пути добавл€€ " 01"," 02" и тд соответсвенно
 						*/
 	int save(string sPath); /* сохран€ет блок в указаной папке, например 'diod', а папку класса определ€ет сама
-											¬нимание !!!  если папка класса отсутствует файл не будет сохнанен !!!
+								¬нимание !!!  если папка класса отсутствует файл не будет сохнанен !!!
 											*/
 private:
 	
@@ -46,11 +46,15 @@ public:
 	DataSet(string dPath);
 	int save(string savePath);
 	virtual ~DataSet();
+	//map<vector<double>, vector<Bloc>> get_mapData();
 
 private:
-	vector<Bloc> blocSet; // обучающие данные
-	map<string, vector<double>> answerForData; // правильные ответы на данные
-
+	//vector<Bloc> blocSet; // обучающие данные
+	map<vector<double>, vector<Bloc>> mapData;
+	//vector<vector<double>> nAnswer; // правильные ответы на данные
+	//vector<string> classesData; 
+	map<string, vector<double>> mapAnswer;
+	//vector<int> numberClassItems;
 };
 
 
