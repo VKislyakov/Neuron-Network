@@ -14,18 +14,18 @@ class Net
 {
 public:
 
-	Net(vector<int> conf); // генерирует сеть с рандомными весами
+	Net(vector<int> conf); // Generates net with random scales.
 
-	Net(vector<vector<vector<double>>> wieght); // генерирует сень на основе трехмерной матрицы весов
+	Net(vector<vector<vector<double>>> wieght); // Generates net based on a three-dimensional matrix of weights.
 
 //!!!! исправить на получение имени или пути к файлу
-	Net(bool g); // генерирует сеть из файла,
+	Net(bool g); // Generates a network from a file.
 
-	vector<double> startNet(vector<double> x); // запускает сеть для вектора х
+	vector<double> startNet(vector<double> x); // Runs net for vector x.
 
-	int teaching(vector<vector<double>> x, vector<vector<double>> d, double e = 0.01); // обучает сеть до заданной точности, только по обучающему множеству
+	int teaching(vector<vector<double>> x, vector<vector<double>> d, double e = 0.01); // Trains net to a given accuracy, only by training set.
 
-	void setLayer(vector<Layer> lay); // задает новые веса для всех слоев
+	void setLayer(vector<Layer> lay); // Specifies new weights for all layers.
 
 	virtual ~Net();
 

@@ -18,12 +18,11 @@ Bloc::~Bloc() {
 }
 //---------------------------------------------------------
 /*	
-	Вспомагалельная функция
-	Возвращает все что есть в папке(имена)
-											*/
+	Auxiliary function.
+	Returns everything in the folder (names).
+*/
 vector<string> getDirectoryAttachments(string dPath) {
 	path p(dPath);
-	cout << p << " is a directory containing:\n";
 	vector<string> v;
 	for (auto&& x : directory_iterator(p))
 		v.push_back(x.path().filename().string());
@@ -31,6 +30,7 @@ vector<string> getDirectoryAttachments(string dPath) {
 	return v;
 }
 //------------------------------------------------------
+
 Bloc::Bloc(string fPath) {
 
 	size_t posR, posL;
@@ -123,15 +123,20 @@ DataSet::DataSet(string dPath) {
 
 	if (is_directory(directWithClasses))
 	{
-		cout << directWithClasses << " is a directory containing:\n";
+		cout << directWithClasses << " is a directory containing Classes :" << endl;
 		vector<string> classesData = getDirectoryAttachments(dPath);
 
-		cout << "Classes :" << endl;
+		size_t numberC = 0; //	номер текущего класса для формирования словоря с ответами
 		for (auto&& className : classesData) {
+			// Buffer vector
+			vector<Bloc> blocSet;
 			string classPath = dPath + "\\" + className; //	путь к папке с файлами для конкретного класса
 			vector<string> classElem = getDirectoryAttachments(classPath);
-			if (classElem[0].size() > 2) { // ещё не оформленые в блоки файлы
+
+			// Not decorated in blocks files
+			if (classElem[0].size() > 2) { 
 				int kolElem = stoi(classElem[classElem.size() - 1].substr(0, 2));
+				//numberClassItems.push_back(kolElem);
 				for (int i = 1; i <= kolElem; i++) {
 					if (i < 10) {
 						Bloc a(classPath + "\\0" + to_string(i));
@@ -143,13 +148,25 @@ DataSet::DataSet(string dPath) {
 					}
 				}
 			}
-			else { // уже оформленные в блоки файлы
+			// Decorated in blocks files
+			else { 
+				//numberClassItems.push_back(stoi(classElem[classElem.size() - 1].substr(0, 2)));
 				for (auto elem:classElem) {
 					Bloc a(classPath + "\\" + elem);
 					blocSet.push_back(a);
 				}
 			}
+			// Forming a vocabulary with answers.
+			vector<double> d(classesData.size(), 0);
+			d[numberC] = 1;
+			mapAnswer.insert(pair<string, vector<double>>(className, d));
+			mapData.insert(pair<vector<double>, vector<Bloc>>(d, blocSet));
+			++numberC;
+			blocSet.clear();
+			d.clear();
+			// End of dictionary formation.			
 		}
+
 		cout << endl << "	Create DATA END	" << endl;
 	}
 	else {
@@ -161,10 +178,17 @@ DataSet::DataSet(string dPath) {
 //---------------------------------------------------------
 
 int DataSet::save(string savePath) {
-	for (auto x : blocSet)
-		x.save(savePath);
+	for(auto blocSet = mapData.begin(); blocSet != mapData.end(); blocSet++)
+		for (auto x : blocSet->second)
+			x.save(savePath);
 	cout << "	Save END	" << endl;
 	return 0;
+}
+
+//---------------------------------------------------------
+
+map<vector<double>, vector<Bloc>> DataSet::getData() {
+	return mapData;
 }
 
 //---------------------------------------------------------

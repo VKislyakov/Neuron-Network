@@ -1,6 +1,7 @@
 #include "Net.h"
 #include "DataSet.h"
 #include <vector>
+#include <map>
 #include <iostream>
 #include <iterator>
 #include <fstream>
@@ -8,6 +9,7 @@
 #include <cmath>
 #include <locale.h>
 #include <boost/filesystem.hpp>
+#include <Eigen/SVD>
 using namespace boost::filesystem;
 using namespace std;
 
@@ -45,12 +47,13 @@ int main(int argc, char* argv[]) {
 	string fPath;
 	getline(cin, fPath);
 	//string fPath = "C:\\VKR\\save\\test.txt";
-	vector<string> v = getDirectoryAttachments(fPath);
-	vector<double> d(0, v.size());
-	//DataSet aa(fPath);
-	//getline(cin, fPath);
-	
-	///aa.save(fPath);
+	//vector<string> v = getDirectoryAttachments(fPath);
+	//vector<double> d(v.size(),0);
+	DataSet a(fPath);
+	getline(cin, fPath);
+	a.save(fPath);
+
+
 
 
 	return 0;

@@ -25,12 +25,12 @@ public:
 
 	virtual ~Bloc();
 
-	Bloc(string path); /*	формирует Bloc по пути из одного файла, если он существует,
-					  иначе из мн-ва файлов по данному пути добавл€€ " 01"," 02" и тд соответсвенно
+	Bloc(string path); /*	Forms Bloc on the path from one file, if it exists.
+							Otherwise from many files along this path, adding "01", "02" and so on respectively.
 						*/
-	int save(string sPath); /* сохран€ет блок в указаной папке, например 'diod', а папку класса определ€ет сама
-											¬нимание !!!  если папка класса отсутствует файл не будет сохнанен !!!
-											*/
+	int save(string sPath); /* Saves the block in the specified folder, for example 'diod', and the class folder defines itself.
+								Attention !!! If the class folder is missing, the file will not be saved !!!
+							*/
 private:
 	
 
@@ -43,14 +43,16 @@ private:
 class DataSet {
 public:
 	DataSet();
-	DataSet(string dPath);
-	int save(string savePath);
 	virtual ~DataSet();
+	DataSet(string dPath);
+	int save(string savePath);	
+	map<vector<double>, vector<Bloc>> getData();
+	//map<vector<double>, vector<Bloc>> get_mapData();
 
 private:
-	vector<Bloc> blocSet; // обучающие данные
-	map<string, vector<double>> answerForData; // правильные ответы на данные
 
+	map<vector<double>, vector<Bloc>> mapData;
+	map<string, vector<double>> mapAnswer;
 };
 
 
