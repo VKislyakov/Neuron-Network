@@ -39,6 +39,8 @@ Bloc::Bloc(string fPath) {
 	answer = fPath.substr(posL + 1, posR - posL - 1);
 
 	path p(fPath);
+
+	// Если считыватся сразу из  файла
 	if (exists(p)) {
 		if (is_regular_file(p)) {
 			std::ifstream in(fPath);
@@ -46,15 +48,15 @@ Bloc::Bloc(string fPath) {
 			string bufData;
 			while (getline(in, bufData))
 			{
-				vector<string> dataElem;
+				vector<double> dataElem;
 				size_t posR, posL;
 				posL = 0;
 				while (posL != bufData.find_last_of(" ")) {
 					posR = bufData.find(" ", posL + 1);
 					if (posL > 0)
-						dataElem.push_back(bufData.substr(posL + 1, posR - posL - 1));
+						dataElem.push_back(stod(bufData.substr(posL + 1, posR - posL - 1)));
 					else
-						dataElem.push_back(bufData.substr(posL, posR - posL));
+						dataElem.push_back(stod(bufData.substr(posL, posR - posL)));
 					posL = posR;
 				}
 				data.push_back(dataElem);
@@ -62,13 +64,14 @@ Bloc::Bloc(string fPath) {
 			}
 		}
 	}
+	// Если файлов несколько
 	else {
 		int numberOfScan = 1;	// отсчет кол-ва файлов для одного экземпляра, по ней строися путь к файлу
 		path p(fPath + " 0" + to_string(numberOfScan));
 
 		//	проход по файлам, пока существуют предполагаемые файлы
 		while (exists(p)) {
-			vector<string> dataElem;
+			vector<double> dataElem;
 			std::ifstream in;
 			if (numberOfScan < 10) {
 				in.open(fPath + " 0" + to_string(numberOfScan));
@@ -82,7 +85,7 @@ Bloc::Bloc(string fPath) {
 
 			// считывание файла
 			while (getline(in, Elem)) {
-				dataElem.push_back(Elem.substr((Elem.find(" ") + 1)));
+				dataElem.push_back(stod(Elem.substr((Elem.find(" ") + 1))));
 			}//--------------- конец считывания файла
 
 			data.push_back(dataElem);
@@ -110,7 +113,7 @@ int Bloc::save(string savePath) {
 	else
 		out.open(savePath + "\\" + answer + "\\" + to_string(numberItem));
 	for (auto dataElem : data) {
-		std::copy(dataElem.begin(), dataElem.end(), std::ostream_iterator<string>(out, " "));
+		std::copy(dataElem.begin(), dataElem.end(), std::ostream_iterator<double>(out, " "));
 		out << endl;
 	}
 	return 0;

@@ -49,9 +49,7 @@ int main(int argc, char* argv[]) {
 	//string fPath = "C:\\VKR\\save\\test.txt";
 	//vector<string> v = getDirectoryAttachments(fPath);
 	//vector<double> d(v.size(),0);
-	DataSet a(fPath);
-	getline(cin, fPath);
-	a.save(fPath);
+	
 
 
 

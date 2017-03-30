@@ -34,7 +34,7 @@ public:
 private:
 	
 
-	vector<vector<string>> data;
+	vector<vector<double>> data;
 
 	string answer;
 };
