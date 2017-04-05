@@ -18,7 +18,7 @@ public:
 
 	Net(vector<vector<vector<double>>> wieght); // Generates net based on a three-dimensional matrix of weights.
 
-//!!!! исправить на получение имени или пути к файлу
+	// !!!! To correct. Get the name or path to the file.
 	Net(bool g); // Generates a network from a file.
 
 	vector<double> startNet(vector<double> x); // Runs net for vector x.
@@ -26,6 +26,8 @@ public:
 	int teaching(vector<vector<double>> x, vector<vector<double>> d, double e = 0.01); // Trains net to a given accuracy, only by training set.
 
 	void setLayer(vector<Layer> lay); // Specifies new weights for all layers.
+
+	double functionError(vector<double> y, vector<double> d);// Counts the error function.
 
 	virtual ~Net();
 
@@ -44,7 +46,6 @@ private:
 
 	vector<vector<vector<double>>> save();
 
-	double functionError(vector<double> y, vector<double> d);
 
 };
 

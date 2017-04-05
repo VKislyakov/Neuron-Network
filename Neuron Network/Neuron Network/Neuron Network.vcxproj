@@ -118,6 +118,7 @@
   <ItemGroup>
     <ClCompile Include="DataSet.cpp" />
     <ClCompile Include="Layer.cpp" />
+    <ClCompile Include="moduleSVD.cpp" />
     <ClCompile Include="Net.cpp" />
     <ClCompile Include="Neuron.cpp" />
     <ClCompile Include="main.cpp" />
@@ -125,6 +126,7 @@
   <ItemGroup>
     <ClInclude Include="DataSet.h" />
     <ClInclude Include="Layer.h" />
+    <ClInclude Include="moduleSVD.h" />
     <ClInclude Include="Net.h" />
     <ClInclude Include="Neuron.h" />
   </ItemGroup>

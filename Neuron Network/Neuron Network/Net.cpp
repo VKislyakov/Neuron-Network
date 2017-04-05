@@ -120,7 +120,19 @@ void Net::setLayer(vector<Layer> lay) {
 
 //---------------------------------------------------------
 
-// не коректная функция, производна активационной функции не вызывается, считается по формуле!!! нужно вызывать!!!
+double Net::functionError(vector<double> y, vector<double> d) {
+	double errorf = 0;
+	for (decltype(y.size()) i = 0; i < y.size(); i++) {
+		errorf = errorf + (y[i] - d[i]) * (y[i] - d[i]);
+	}
+	return errorf / 2;
+}
+
+//---------------------------------------------------------
+// Next private methods.!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//---------------------------------------------------------
+
+// Not a correct function, the derivative of the activation function is not called, is considered by the formula !!! You need to call!
 vector<vector<double>> Net::deltaM(vector<double> d) {
 
 	vector<double> deltalay;
@@ -232,12 +244,4 @@ vector<vector<vector<double>>> Net::save() {
 
 //---------------------------------------------------------
 
-double Net::functionError(vector<double> y, vector<double> d) {
-	double errorf = 0;
-	for (decltype(y.size()) i = 0; i < y.size(); i++) {
-		errorf = errorf + (y[i] - d[i]) * (y[i] - d[i]);
-	}
-	return errorf / 2;
-}
 
-//---------------------------------------------------------

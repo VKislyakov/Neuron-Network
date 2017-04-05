@@ -12,15 +12,21 @@
 using namespace boost::filesystem;
 using namespace std;
 
-class DataSet;
+
 vector<string> getDirectoryAttachments(string dPath);
 //---------------------------------------------------------
+struct Data
+{
+	vector<vector<double>> data;
+	vector<vector<double>> answer;
+};
+//---------------------------------------------------------
 
+//---------------------------------------------------------
 class Bloc {
 
 public:
-	friend DataSet;
-
+	friend class ParseData;
 	Bloc();
 
 	virtual ~Bloc();
@@ -28,33 +34,27 @@ public:
 	Bloc(string path); /*	Forms Bloc on the path from one file, if it exists.
 							Otherwise from many files along this path, adding "01", "02" and so on respectively.
 						*/
-	int save(string sPath); /* Saves the block in the specified folder, for example 'diod', and the class folder defines itself.
-								Attention !!! If the class folder is missing, the file will not be saved !!!
-							*/
+	vector<vector<double>> data;
 private:
 	
-
-	vector<vector<string>> data;
-
-	string answer;
+	
 };
 
 //---------------------------------------------------------
-class DataSet {
+class ParseData {
 public:
-	DataSet();
-	virtual ~DataSet();
-	DataSet(string dPath);
-	int save(string savePath);	
-	map<vector<double>, vector<Bloc>> getData();
-	//map<vector<double>, vector<Bloc>> get_mapData();
-
+	ParseData();
+	virtual ~ParseData();
+	ParseData(string dPath);
+	vector<Data> getDataTEST();
+	
 private:
-
-	map<vector<double>, vector<Bloc>> mapData;
-	map<string, vector<double>> mapAnswer;
+	vector<vector<double>> dataAnswer;
+	vector<Bloc> blocSet;
+	vector<int> numberDataItems;
+	map<vector<double>, string> mapAnswer;
 };
 
-
+//---------------------------------------------------------
 
 #endif // DATASET_H
