@@ -1,11 +1,11 @@
 #include "DataSet.h"
 
-
-DataSet::DataSet() {
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+ParseData::ParseData() {
 
 }
 //---------------------------------------------------------
-DataSet::~DataSet() {
+ParseData::~ParseData() {
 
 }
 //---------------------------------------------------------
@@ -17,7 +17,13 @@ Bloc::~Bloc() {
 
 }
 //---------------------------------------------------------
-/*	
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+
+//---------------------------------------------------------
+// Public methods.!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//---------------------------------------------------------
+
+/*
 	Auxiliary function.
 	Returns everything in the folder (names).
 */
@@ -30,17 +36,50 @@ vector<string> getDirectoryAttachments(string dPath) {
 	return v;
 }
 //------------------------------------------------------
-
+vector<Data> ParseData::getDataTEST() {
+	vector<Data> getBack;
+	Data teach, test, control;
+	size_t sizeblocSet = 0, sizeSum = 0;
+	
+	for (auto sizeData : numberDataItems) {
+		// Distribution of data between sets.
+		
+		size_t  sizeTeach, sizeTest, sizeControl;
+		sizeTeach = sizeData*0.6;
+		sizeTest = (sizeData - sizeTeach)*0.5;
+		sizeControl = sizeData - sizeTeach - sizeTest;
+		for (/**/; sizeblocSet < sizeSum + sizeData; sizeblocSet++) {
+			if (sizeblocSet < sizeSum+ sizeTeach) {
+				for (auto v : blocSet[sizeblocSet].data) {
+					teach.data.push_back(v);
+					teach.answer.push_back(dataAnswer[sizeblocSet]);
+				}
+			}
+			else if(sizeblocSet < sizeSum + sizeTeach+ sizeTest){
+				for (auto v : blocSet[sizeblocSet].data) {
+					test.data.push_back(v);
+					test.answer.push_back(dataAnswer[sizeblocSet]);
+				}
+			}
+			else {
+				for (auto v : blocSet[sizeblocSet].data) {
+					control.data.push_back(v);
+					control.answer.push_back(dataAnswer[sizeblocSet]);
+				}
+			}
+		}
+		sizeSum += sizeData;
+	}
+	getBack.push_back(teach);
+	getBack.push_back(test);
+	getBack.push_back(control);
+	return getBack;
+}
+//---------------------------------------------------------
 Bloc::Bloc(string fPath) {
 
-	size_t posR, posL;
-	posR = fPath.rfind("\\");
-	posL = fPath.rfind("\\", posR - 1);
-	answer = fPath.substr(posL + 1, posR - posL - 1);
-
 	path p(fPath);
-
-	// Если считыватся сразу из  файла
+	// If read from the file at once.
 	if (exists(p)) {
 		if (is_regular_file(p)) {
 			std::ifstream in(fPath);
@@ -64,12 +103,12 @@ Bloc::Bloc(string fPath) {
 			}
 		}
 	}
-	// Если файлов несколько
+	// If there are several files.
 	else {
-		int numberOfScan = 1;	// отсчет кол-ва файлов для одного экземпляра, по ней строися путь к файлу
+		int numberOfScan = 1;	// Counting the number of files for one instance, the path to the file is built on it.
 		path p(fPath + " 0" + to_string(numberOfScan));
 
-		//	проход по файлам, пока существуют предполагаемые файлы
+		//	Passage on files while there are supposed files.
 		while (exists(p)) {
 			vector<double> dataElem;
 			std::ifstream in;
@@ -83,13 +122,12 @@ Bloc::Bloc(string fPath) {
 			}
 			string Elem;
 
-			// считывание файла
+			// Reading a file.
 			while (getline(in, Elem)) {
 				dataElem.push_back(stod(Elem.substr((Elem.find(" ") + 1))));
-			}//--------------- конец считывания файла
+			}
 
 			data.push_back(dataElem);
-
 
 			++numberOfScan;
 			if (numberOfScan < 10)
@@ -98,30 +136,13 @@ Bloc::Bloc(string fPath) {
 				p = path(fPath + " " + to_string(numberOfScan));
 			dataElem.clear();
 			in.close();
-		} //---------------- конец прохода по файлам
+		}
 	}
 }
 
 //---------------------------------------------------------
 
-int Bloc::save(string savePath) {
-	std::ofstream out;
-	vector<string> savedItems = getDirectoryAttachments(savePath + "\\" + answer);
-	int numberItem = savedItems.size()+1;
-	if (numberItem < 10)
-		out.open(savePath + "\\" + answer + "\\0" + to_string(numberItem));
-	else
-		out.open(savePath + "\\" + answer + "\\" + to_string(numberItem));
-	for (auto dataElem : data) {
-		std::copy(dataElem.begin(), dataElem.end(), std::ostream_iterator<double>(out, " "));
-		out << endl;
-	}
-	return 0;
-}
-
-//---------------------------------------------------------
-
-DataSet::DataSet(string dPath) {
+ParseData::ParseData(string dPath) {
 	path directWithClasses(dPath);
 
 	if (is_directory(directWithClasses))
@@ -129,45 +150,35 @@ DataSet::DataSet(string dPath) {
 		cout << directWithClasses << " is a directory containing Classes :" << endl;
 		vector<string> classesData = getDirectoryAttachments(dPath);
 
-		size_t numberC = 0; //	номер текущего класса для формирования словоря с ответами
+		size_t numberC = 0; //	Number of the current class to form a dictionary with answers
 		for (auto&& className : classesData) {
-			// Buffer vector
-			vector<Bloc> blocSet;
-			string classPath = dPath + "\\" + className; //	путь к папке с файлами для конкретного класса
-			vector<string> classElem = getDirectoryAttachments(classPath);
 
-			// Not decorated in blocks files
-			if (classElem[0].size() > 2) { 
-				int kolElem = stoi(classElem[classElem.size() - 1].substr(0, 2));
-				//numberClassItems.push_back(kolElem);
-				for (int i = 1; i <= kolElem; i++) {
-					if (i < 10) {
-						Bloc a(classPath + "\\0" + to_string(i));
-						blocSet.push_back(a);
-					}
-					else {
-						Bloc a(classPath + "\\" + to_string(i));
-						blocSet.push_back(a);
-					}
-				}
-			}
-			// Decorated in blocks files
-			else { 
-				//numberClassItems.push_back(stoi(classElem[classElem.size() - 1].substr(0, 2)));
-				for (auto elem:classElem) {
-					Bloc a(classPath + "\\" + elem);
-					blocSet.push_back(a);
-				}
-			}
-			// Forming a vocabulary with answers.
+			// Forming a dict with answers.
 			vector<double> d(classesData.size(), 0);
 			d[numberC] = 1;
-			mapAnswer.insert(pair<string, vector<double>>(className, d));
-			mapData.insert(pair<vector<double>, vector<Bloc>>(d, blocSet));
 			++numberC;
-			blocSet.clear();
+			mapAnswer.insert(pair<vector<double>, string>(d, className));	
+
+			//	Path to a folder with files for a particular class.
+			string classPath = dPath + "\\" + className; 
+			//
+			vector<string> classElem = getDirectoryAttachments(classPath);
+			int kolElem = stoi(classElem[classElem.size() - 1].substr(0, 2));
+			numberDataItems.push_back(kolElem);
+			//numberClassItems.push_back(kolElem);
+			for (int i = 1; i <= kolElem; i++) {
+				if (i < 10) {
+					Bloc a(classPath + "\\0" + to_string(i));
+					blocSet.push_back(a);
+					dataAnswer.push_back(d);
+				}
+				else {
+					Bloc a(classPath + "\\" + to_string(i));
+					blocSet.push_back(a);
+					dataAnswer.push_back(d);
+				}
+			}
 			d.clear();
-			// End of dictionary formation.			
 		}
 
 		cout << endl << "	Create DATA END	" << endl;
@@ -177,21 +188,12 @@ DataSet::DataSet(string dPath) {
 	}
 }
 
-
 //---------------------------------------------------------
 
-int DataSet::save(string savePath) {
-	for(auto blocSet = mapData.begin(); blocSet != mapData.end(); blocSet++)
-		for (auto x : blocSet->second)
-			x.save(savePath);
-	cout << "	Save END	" << endl;
-	return 0;
-}
+
 
 //---------------------------------------------------------
-
-map<vector<double>, vector<Bloc>> DataSet::getData() {
-	return mapData;
-}
+// Private methods.!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//---------------------------------------------------------
 
 //---------------------------------------------------------

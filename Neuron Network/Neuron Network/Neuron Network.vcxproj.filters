@@ -30,6 +30,9 @@
     <ClCompile Include="DataSet.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="moduleSVD.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Neuron.h">
@@ -42,6 +45,9 @@
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="DataSet.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="moduleSVD.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>
