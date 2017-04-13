@@ -154,8 +154,8 @@ ParseData::ParseData(string dPath) {
 		for (auto&& className : classesData) {
 
 			// Forming a dict with answers.
-			vector<double> d(classesData.size(), 0);
-			d[numberC] = 1;
+			vector<double> d(classesData.size(), 0.05);
+			d[numberC] = 0.95;
 			++numberC;
 			mapAnswer.insert(pair<vector<double>, string>(d, className));	
 
@@ -189,7 +189,6 @@ ParseData::ParseData(string dPath) {
 }
 
 //---------------------------------------------------------
-
 
 
 //---------------------------------------------------------

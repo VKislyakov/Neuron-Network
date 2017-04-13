@@ -3,6 +3,12 @@
 Net::~Net() {
 }
 
+Net::Net() {
+}
+//---------------------------------------------------------
+
+//---------------------------------------------------------
+// Public methods.!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //---------------------------------------------------------
 
 Net::Net(vector<int> conf) :config(conf) {
@@ -11,9 +17,7 @@ Net::Net(vector<int> conf) :config(conf) {
 		layers.push_back(a);
 	}
 };
-
 //---------------------------------------------------------
-
 Net::Net(vector<vector<vector<double>>> wieght)
 {
 	for (auto elemWieght : wieght) {
@@ -21,12 +25,10 @@ Net::Net(vector<vector<vector<double>>> wieght)
 		layers.push_back(a);
 	}
 }
-
 //---------------------------------------------------------
-
-Net::Net(bool g)
+Net::Net(string Path)
 {
-	ifstream in("saveW.txt");
+	ifstream in(Path);
 	vector<int> conf;
 	int read;
 	in >> read;
@@ -60,66 +62,106 @@ Net::Net(bool g)
 		layers.push_back(a);
 	}
 }
-
 //---------------------------------------------------------
-
 vector<double> Net::startNet(vector<double> x) {
 	for (int i = 0; i < config[0]; i++) {
 		x = layers[i].actF(x);
 	}
 	return x;
 }
-
 //---------------------------------------------------------
-
-int Net::teaching(vector<vector<double>> x, vector<vector<double>> d, double e) {
-
-	int number_epoch = 0;
+int Net::teaching(vector<vector<double>> x, vector<vector<double>> d, vector<vector<double>> testX, vector<vector<double>> testD, double e) {
+	cout << endl << "Start teach" << endl;
+	int numberEpoch = 0;
 	int	random_key = 0;
-	vector<bool> epochControlVector(x.size(), false);
-	double epochControl = true;
-	ofstream outErrouTeach("errou_teach.txt");
-	double errou_teach = 10; // задаем переменную для хранения ошибки на обучающем мн-ве, должна быть больше переменной "е"
-
-	while (errou_teach > e && number_epoch < 10000) {
-		for (auto elemEpContVect : epochControlVector)
-			epochControl = epochControl && elemEpContVect;
+	int iter = 0;
+	int errorControlEndNumber = 0;
+	bool epochControl = true, diffControl = true, minControl = true;
+	ofstream outErrouTeach(savePath + "\\error_teach.txt");
+	double errorTeach = 10, errorMax = 0, errorMin = 5000, errorTest = 0, errorMinTest = 100;
+	vector<int> numberTeachItem(x.size(),0);
+	list<double> diffTeachTestErrou;
+	// Begin teach.
+	while (errorTeach > e && numberEpoch < 1000 && (diffControl || minControl)) {
+		for (auto v : numberTeachItem)
+			epochControl = epochControl && v;
 		if (epochControl) {
-			for (auto &elemEpContVect : epochControlVector)
-				elemEpContVect = false;
-			number_epoch++;
-			errou_teach = 0;
+			iter = 0;
+			vector<int> a(x.size(), 0);
+			numberTeachItem = a;
+			numberEpoch++;
+			save(numberEpoch);
+			errorTeach = 0;
+			errorTest = 0;
+			errorMax = 0;
+			errorMin = 5000;
+			// Calculating errors.
+			for (decltype(testX.size()) j = 0; j < testX.size(); j++)
+				errorTest = errorTest + functionError(startNet(testX[j]), testD[j]);	
+			errorTest = errorTest / testX.size();
+			if(errorMinTest > errorTest)
+				errorMinTest = errorTest;
 			for (decltype(x.size()) j = 0; j < x.size(); j++)
 			{
-				errou_teach = errou_teach + functionError(startNet(x[j]), d[j]);
+				double buffErrou = functionError(startNet(x[j]), d[j]);
+				errorTeach = errorTeach + buffErrou;
+				if (buffErrou > errorMax)
+					errorMax = buffErrou;
+				if (buffErrou < errorMin)
+					errorMin = buffErrou;
 			}
-			if (number_epoch % 20 == 0 || number_epoch < 30 || errou_teach < e + e) {
-				cout << number_epoch << " == " << errou_teach << endl;
-				outErrouTeach << number_epoch << " " << errou_teach << endl;
-				if (number_epoch % 200 == 0) {
-					save();
+			errorTeach = errorTeach / x.size();
+			// Error records by epoch number in console.
+			cout << endl << numberEpoch << " == " << errorTeach << endl;
+			cout << " TEST == " << errorTest << endl;
+			cout << " MinErrou = " << errorMin << " MaxErrou = " << errorMax << endl;
+			// Error records by epoch number in file.
+			outErrouTeach << numberEpoch << " " << errorTeach << " " << errorTest << endl;
+			// Monitoring of the change in the minimum error on the test set.
+			if (diffControl) {
+				if (numberEpoch == 1)
+					for (size_t i = 0; i < 5; i++)
+						diffTeachTestErrou.push_back(abs(errorTest - errorTeach));
+				else {
+					diffTeachTestErrou.push_back(errorTest - errorTeach);
+					diffTeachTestErrou.pop_front();
 				}
+				double sumDiff = 0;
+				for (auto item : diffTeachTestErrou) {
+					sumDiff += item;
+				}
+				if (sumDiff / 5 > 0.06)
+					diffControl = false;
 			}
-
+			if (!(diffControl) && minControl && ((errorMinTest + 0.01) >= errorTest)) {
+				minControl = false;
+				continue;
+			}
 		}
+		// New iteration.
 		epochControl = true;
-		random_key = rand() % x.size();
-		teach(x[random_key], d[random_key]);
-		epochControlVector[random_key] = true;
+		iter++;
+		do
+		{
+			random_key = rand() % x.size();
+			numberTeachItem[random_key]++;
+		} while (numberTeachItem[random_key]>3);
+
+		cout << "\r\t\t\t\t\t\t\t\r=== Iter " << iter << "\t"<< numberTeachItem[random_key];
+		double buffErrou = teach(x[random_key], d[random_key]);
+		cout << "\tENDteach ===";
+		if (buffErrou < errorMin + (errorMax - errorMin)*0.70)
+			numberTeachItem[random_key] = 3;
 	}
 	outErrouTeach.close();
-	save();
+	save(0);
 	return (0);
 }
-
 //---------------------------------------------------------
-
 void Net::setLayer(vector<Layer> lay) {
 	layers = lay;
 }
-
 //---------------------------------------------------------
-
 double Net::functionError(vector<double> y, vector<double> d) {
 	double errorf = 0;
 	for (decltype(y.size()) i = 0; i < y.size(); i++) {
@@ -129,17 +171,18 @@ double Net::functionError(vector<double> y, vector<double> d) {
 }
 
 //---------------------------------------------------------
-// Next private methods.!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// Private methods.!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //---------------------------------------------------------
 
-// Not a correct function, the derivative of the activation function is not called, is considered by the formula !!! You need to call!
 vector<vector<double>> Net::deltaM(vector<double> d) {
 
 	vector<double> deltalay;
 	vector<vector<double>> delta(config[0]);
 	vector<double> activf = layers[config[0] - 1].actF();
+	vector<double> derivf = layers[config[0] - 1].derF();
 	for (int i = 0; i < config[config.size() - 1]; i++) {
-		deltalay.push_back((activf[i] - d[i])*(1 - activf[i] * activf[i]));
+		deltalay.push_back((activf[i] - d[i])*derivf[i]);
+		//deltalay.push_back((activf[i] - d[i])*(activf[i] *(1- activf[i])));
 	}
 	delta[config[0] - 1] = deltalay;
 
@@ -150,30 +193,28 @@ vector<vector<double>> Net::deltaM(vector<double> d) {
 		matrix_w.clear();
 		matrix_w = layers[lay + 1].getMatrixW();
 		vector<double> activf = layers[lay].actF();
+		vector<double> derivf = layers[lay].derF();
 		double sum_del_w;
 		for (int j = 0; j < config[lay + 2]; j++) {
 			sum_del_w = 0;
 			for (decltype(matrix_w.size()) k = 0; k < matrix_w.size(); k++) {
 				sum_del_w = sum_del_w + delta[lay + 1][k] * matrix_w[k][j];
 			}
-			deltalay.push_back(sum_del_w*(1 - activf[j] * activf[j]));
+			deltalay.push_back(sum_del_w*derivf[j]);
+			//deltalay.push_back(sum_del_w*(activf[j] * (1 - activf[j])));
 		}
 		delta[lay] = deltalay;
 	}
 	return delta;
 }
-
 //---------------------------------------------------------
-
 void Net::correct(vector<vector<double>> delta, double alfa, vector<double> x) {
 	layers[0].correct(delta[0], x, alfa);
 	for (int i = 1; i < config[0]; i++) {
 		layers[i].correct(delta[i], layers[i - 1].actF(), alfa);
 	}
 }
-
 //---------------------------------------------------------
-
 double Net::goldenSection(vector<vector<double>> delta, vector<double> x, vector<double> d) {
 	Net minimiNet(config);
 	minimiNet.setLayer(layers);
@@ -185,14 +226,17 @@ double Net::goldenSection(vector<vector<double>> delta, vector<double> x, vector
 	x1 = b - (b - a) / fi;
 	x2 = a + (b - a) / fi;
 	while (abs(b - a) > 0.01) {
+
 		minimiNet.setLayer(layers);//	!
 		minimiNet.correct(delta, x1, x);
 		y = minimiNet.startNet(x);
 		f1 = minimiNet.functionError(y, d);
+
 		minimiNet.setLayer(layers);//	!
 		minimiNet.correct(delta, x2, x);
 		y = minimiNet.startNet(x);
 		f2 = minimiNet.functionError(y, d);
+
 		if (f1 > f2) {
 			a = x1;
 			x1 = x2;
@@ -206,9 +250,7 @@ double Net::goldenSection(vector<vector<double>> delta, vector<double> x, vector
 	}
 	return (a + b) / 2;
 }
-
 //---------------------------------------------------------
-
 double Net::teach(vector<double> x, vector<double> d) {
 	vector<double> y = startNet(x);
 	vector<vector<double>> delta = deltaM(d);
@@ -216,12 +258,10 @@ double Net::teach(vector<double> x, vector<double> d) {
 	correct(delta, alfa, x);
 	return (functionError(y, d));
 }
-
 //---------------------------------------------------------
-
-vector<vector<vector<double>>> Net::save() {
+vector<vector<vector<double>>> Net::save(int i) {
 	vector<vector<vector<double>>> W;
-	ofstream outs("saveW.txt");
+	ofstream outs(savePath+"\\saveWeight" + to_string(i) + ".txt");
 	for (int i = 0; i < config[0]; i++)
 	{
 		vector<vector<double>> a = layers[i].getMatrixW();
@@ -241,7 +281,6 @@ vector<vector<vector<double>>> Net::save() {
 	outs.close();
 	return(W);
 }
-
 //---------------------------------------------------------
 
 

@@ -2,6 +2,8 @@
 
 Layer::~Layer() {
 }
+Layer::Layer() {
+}
 
 Layer::Layer(int early_kol_neu, int kol_neu) {
 	for (int i = 0; i < kol_neu; i++) {
@@ -32,6 +34,14 @@ vector<double> Layer::actF(vector<double> X) {
 vector<double> Layer::actF() {
 	return(activ_f);
 }
+
+vector<double> Layer::derF() {
+	vector<double> getBack;
+	for (auto neuron : neurons)
+		getBack.push_back(neuron.derF());
+	return(getBack);
+}
+
 
 int Layer::correct(vector<double> deltw, vector<double> y, double alfa) {
 	for (decltype(neurons.size()) i = 0, sz = neurons.size(); i < sz; i++) {

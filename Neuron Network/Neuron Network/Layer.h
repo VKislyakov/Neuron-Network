@@ -11,6 +11,8 @@ class Layer {
 
 public:
 
+	Layer();
+
 	Layer(int early_kol_neu, int kol_neu);
 
 	Layer(vector<vector<double>> W);
@@ -20,6 +22,8 @@ public:
 	vector<double> actF(vector<double> X);
 
 	vector<double> actF();
+
+	vector<double> derF();
 
 	int correct(vector<double> deltw, vector<double> y, double alfa);
 

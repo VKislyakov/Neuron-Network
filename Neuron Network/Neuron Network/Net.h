@@ -3,7 +3,9 @@
 #define NET_H
 #include "Layer.h"
 #include <vector>
+#include <list>
 #include <iostream>
+#include <string>
 #include <iterator>
 #include <fstream>
 #include <cstdlib>
@@ -13,28 +15,39 @@ using namespace std;
 class Net
 {
 public:
+	// Path to save weights.
+	string savePath;
 
-	Net(vector<int> conf); // Generates net with random scales.
+	// Generates net with random scales.
+	Net(vector<int> conf); 
 
-	Net(vector<vector<vector<double>>> wieght); // Generates net based on a three-dimensional matrix of weights.
+	// Generates net based on a three-dimensional matrix of weights.
+	Net(vector<vector<vector<double>>> wieght); 
+	
+	// Generates a network from a file.
+	Net(string Path); 
+	
+	// Runs net for vector x.
+	vector<double> startNet(vector<double> x); 
 
-	// !!!! To correct. Get the name or path to the file.
-	Net(bool g); // Generates a network from a file.
+	// Trains net to a given accuracy, only by training set.
+	int teaching(vector<vector<double>> x, vector<vector<double>> d, vector<vector<double>> testX, vector<vector<double>> testD, double e = 0.01);
+	
+	// Specifies new weights for all layers.
+	void setLayer(vector<Layer> lay); 
 
-	vector<double> startNet(vector<double> x); // Runs net for vector x.
-
-	int teaching(vector<vector<double>> x, vector<vector<double>> d, double e = 0.01); // Trains net to a given accuracy, only by training set.
-
-	void setLayer(vector<Layer> lay); // Specifies new weights for all layers.
-
-	double functionError(vector<double> y, vector<double> d);// Counts the error function.
+	// Counts the error function.
+	double functionError(vector<double> y, vector<double> d);
 
 	virtual ~Net();
+
+	Net();
 
 private:
 	int kol_sloev;
 	vector<int> config;
 	vector<Layer> layers;
+	
 
 	vector<vector<double>> deltaM(vector<double> d);
 
@@ -44,7 +57,7 @@ private:
 
 	double teach(vector<double> x, vector<double> d);
 
-	vector<vector<vector<double>>> save();
+	vector<vector<vector<double>>> save(int i);
 
 
 };

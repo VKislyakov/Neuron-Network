@@ -8,81 +8,197 @@
 #include <fstream>
 #include <cstdlib>
 #include <cmath>
-#include <locale.h>
-#include <boost/filesystem.hpp>
 #include <Eigen/SVD>
-using namespace boost::filesystem;
+#include <algorithm> // for copy
+#include <iterator> // for ostream_iterator
 using namespace std;
 using namespace Eigen;
+//---------------------------------------------------------
+double divider(double a) {
+	if (abs(a) > 10)
+		return(100);
+	if (abs(a) > 1)
+		return(10);
+	return(1);
+}
 
+int divisionComponents(vector<vector<double>> &x, double buffDiv1, double buffDiv2) {
+	if (buffDiv1 == 1)
+		return(1);
+	for (size_t i = 0; i < x.size(); i++)
+		x[i][0] = x[i][0] / buffDiv1;
+	if (buffDiv2 > 1)
+		for (size_t i = 0; i < x.size(); i++)
+			x[i][1] = x[i][1] / buffDiv2;
+	return (0);
+}
+//---------------------------------------------------------
+void teachNet() {
+	cout << "Teach Net" << endl;
+	string Path1, Path2;
 
-int main(int argc, char* argv[]) {
+	cout << "Path to data: " << endl;
+	getline(cin, Path1);
 
-	/*
-	vector<int> settings_net = { 2,1,6,1 }; // настройки сети
-	vector<vector<double>> x = { { 0.045 },{ 0.106 },{ 0.14 },{ 0.2 },{ 0.24 },{ 0.3 },{ 0.35 },{ 0.39 },{ 0.43 },{ 0.495 },{ 0.54 },{ 0.61 } };
-	vector<vector<double>> d;
-	for (auto arg : x) {
-		vector<double> a = { sin(10 * arg[0]) / 2 };
-		d.push_back(a);
-	}
-	bool start_control;
-	cout << "0 - start with teacing222"<< endl <<" 1 - start without teacing"<<endl;
-	cin >> start_control;
+	cout << "Path to save: " << endl;
+	getline(cin, Path2);
 
-	if (start_control) {
-		Net generalNet(true);
-		ofstream out("rez.txt");
-		for (double i = 0.01; i <0.63; i = i + 0.01) {
-			x[0][0] = i;
-			d[0] = generalNet.startNet(x[0]);
-			out << d[0][0] << endl;
-		}
-		out.close();
-	}
-	else{
-		Net generalNet(settings_net);
-		generalNet.teaching(x, d);
-	}
-	*/
+	int kolNeu, kolComp;
+	cout << "Number of neurons = ";
+	cin >> kolNeu;
 
+	cout << "Number of components = ";
+	cin >> kolComp;
+
+	ParseData a1(Path1);
+	vector<Data> b1 = a1.getDataTEST();
+	moduleSVD c1(b1[0].data);
+	//-----------------------------------------------------
+	vector<vector<double>> x, testX, d, testD;
+
+	x = c1.getTeachData(kolComp);
+	d = b1[0].answer;
+	testX = c1.getNewhData(kolComp, b1[1].data);
+	testD = b1[1].answer;
+
+	divisionComponents(testX, divider(x[0][0]), divider(x[0][1]));
+	divisionComponents(x, divider(x[0][0]), divider(x[0][1]));
 	
+	
+	vector<int> settings_net = { 2,kolComp,kolNeu,14 }; // настройки сети
+	Net generalNet(settings_net);
+	generalNet.savePath = Path2;
+	generalNet.teaching(x, d, testX, testD, 0.08);
+
+}
+
+void workNet() {
+	cout << "Work Net!" << endl;
 	string Path1, Path2, Path3;
 
+	cout << "Path to data: " << endl;
 	getline(cin, Path1);
-	getline(cin, Path2);
-	getline(cin, Path3);
+
 	
+
 	ParseData a1(Path1);
-	ParseData a2(Path1);
-	ParseData a3(Path1);
-
 	vector<Data> b1 = a1.getDataTEST();
-	vector<Data> b2 = a2.getDataTEST();
-	vector<Data> b3 = a3.getDataTEST();
-
 	moduleSVD c1(b1[0].data);
-	moduleSVD c2(b2[0].data);
-	moduleSVD c3(b3[0].data);
+	//-----------------------------
+	cout << endl << "Path to save: " << endl;
+	getline(cin, Path2);
+	cout << "Path to weight: " << endl;
+	getline(cin, Path3);
+	int kolComp,kolSave;
+	cout << "Number of components = ";
+	cin >> kolComp;
+	cout << "Number of components = ";
+	cin >> kolSave;
+	vector<int> answerNet;
+	for(int numberSave = 1;numberSave<=kolSave;numberSave++){
+			
+		Net generalNet(Path3 + to_string(numberSave) + ".txt");
 
-	vector<vector<double>> v1,test1;
-	vector<vector<double>> v2, test2;
-	vector<vector<double>> v3, test3;
+		vector<vector<double>> xControl, dControl, x;
+		xControl = c1.getNewhData(kolComp, b1[2].data);
+		dControl = b1[2].answer;
+		x = c1.getTeachData(kolComp);
 
-	v1 = c1.getTeachData(20);
-	test1 = c1.getNewhData(20, b1[1].data);
+		divisionComponents(xControl, divider(x[0][0]), divider(x[0][1]));
 
-	v2 = c2.getTeachData(20);
-	test2 = c2.getNewhData(20, b2[1].data);
+		std::ofstream out(Path2 + to_string(numberSave) + ".txt");
+		int trueAnswer = 0;
 
-	v3 = c3.getTeachData(20);
-	test3 = c3.getNewhData(20, b3[1].data);
+		for (size_t i = 0; i < xControl.size(); i++) {
+			vector<double> y = generalNet.startNet(xControl[i]);
+			int answerY = 0, answerD = 0;
+			double maxY = 0, maxD = 0;
+			for (decltype(y.size()) j = 0; j < y.size(); j++) {
+				if (y[j] > maxY) {
+					maxY = y[j];
+					answerY = j;
+				}
+				if (dControl[i][j] > maxD) {
+					maxD = dControl[i][j];
+					answerD = j;
+				}
+			}
+			out << answerD << " == " << answerY;
+			if (answerD == answerY) {
+				out << " YES" << endl;
+				trueAnswer++;
+			}
+			else
+			{
+				out << " NO" << endl;
+			}
+		}
+		answerNet.push_back(trueAnswer);
+		out << trueAnswer << "/" << xControl.size();
+		out.close();
+	}
+	std::ofstream out(Path2 + "All.txt");
+	std::copy(answerNet.begin(), answerNet.end(), std::ostream_iterator<int>(out, "\n"));
+}
 
+void lookAnswerData() {
+	cout << "Work Net!" << endl;
+	string Path1, Path2, Path3;
 
-	
-	//cout << c.svd.singularValues();
-	
-	
-	
+	cout << "Path to data: " << endl;
+	getline(cin, Path1);
+	cout << "Path to save: " << endl;
+	getline(cin, Path2);
+	cout << "Path to weight: " << endl;
+	getline(cin, Path3);
+
+	int kolComp;
+	cout << "Number of components = ";
+	cin >> kolComp;
+
+	Net generalNet(Path2);
+	generalNet.savePath = Path2;
+
+	ParseData a1(Path1);
+	vector<Data> b1 = a1.getDataTEST();
+	moduleSVD c1(b1[0].data);
+
+	vector<vector<double>> xControl, dControl;
+	xControl = c1.getNewhData(kolComp, b1[2].data);
+	dControl = b1[2].answer;
+	/*
+	for (size_t i = 0; i < xControl.size(); i++) {
+		xControl[i][0] = xControl[i][0] / 10;
+	}
+	*/
+	std::ofstream out(Path2 + "\\controlShowData.txt");
+	for (size_t i = 0; i < xControl.size(); i++) {
+		out << endl;
+		vector<double> y = generalNet.startNet(xControl[i]);
+		for (decltype(y.size()) j = 0; j < y.size(); j++) {
+			out << dControl[i][j] << "       ";
+		}
+		out << endl;
+		for (decltype(y.size()) j = 0; j < y.size(); j++) {
+			out << y[j] << " ";
+		}
+		out << endl;
+	}
+}
+
+int main(int argc, char* argv[]) {
+	string start;
+	cout << "teach\nwork\nlook\n";
+	getline(cin, start);
+	cout << endl;
+	if (start == "teach")
+
+		teachNet();
+	if (start == "work")
+
+		workNet();
+	if ((start == "look"))
+
+		lookAnswerData();
 	return 0;
 }
