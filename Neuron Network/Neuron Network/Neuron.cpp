@@ -1,8 +1,9 @@
 #include "Neuron.h"
 
 Neuron::Neuron(int number_weight) {
+	srand(time(0));
 	for (int i = 0; i <= number_weight; i++) // 
-		weights.push_back(0.0001 * (rand() % 4001 - 2000));  // 
+		weights.push_back(0.0001 * (rand() % 6001 - 3000));  // 
 	sum = 0;
 	F = 0;
 }

@@ -71,6 +71,7 @@ vector<double> Net::startNet(vector<double> x) {
 }
 //---------------------------------------------------------
 int Net::teaching(vector<vector<double>> x, vector<vector<double>> d, vector<vector<double>> testX, vector<vector<double>> testD, double e) {
+	srand(time(0));
 	cout << endl << "Start teach" << endl;
 	int numberEpoch = 0;
 	int	random_key = 0;

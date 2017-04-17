@@ -3,6 +3,7 @@
 #define NEURON_H
 #include <vector>
 #include <cmath>
+#include <ctime>
 using namespace std;
 
 class Neuron

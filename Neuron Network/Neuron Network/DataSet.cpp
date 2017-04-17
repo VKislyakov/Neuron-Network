@@ -27,7 +27,7 @@ Bloc::~Bloc() {
 	Auxiliary function.
 	Returns everything in the folder (names).
 */
-vector<string> getDirectoryAttachments(string dPath) {
+vector<string> ParseData::getDirectoryAttachments(string dPath) {
 	path p(dPath);
 	vector<string> v;
 	for (auto&& x : directory_iterator(p))
@@ -74,6 +74,39 @@ vector<Data> ParseData::getDataTEST() {
 	getBack.push_back(test);
 	getBack.push_back(control);
 	return getBack;
+}
+//---------------------------------------------------------
+vector<Data> ParseData::getDataCrossValid(vector<CrossValid> crossV) {
+	Data teach, test, control;
+	size_t sizeSum = 0;
+	for (size_t numberClass = 0; numberClass < crossV.size(); numberClass++) {
+
+		for (auto i: crossV[numberClass].teach)
+			for (auto v : blocSet[sizeSum + i].data) {
+				teach.data.push_back(v);
+				teach.answer.push_back(dataAnswer[sizeSum + i]);
+			}
+		for (auto i : crossV[numberClass].test)
+			for (auto v : blocSet[sizeSum + i].data) {
+				test.data.push_back(v);
+				test.answer.push_back(dataAnswer[sizeSum + i]);
+			}
+		for (auto i : crossV[numberClass].control)
+			for (auto v : blocSet[sizeSum + i].data) {
+				control.data.push_back(v);
+				control.answer.push_back(dataAnswer[sizeSum + i]);
+			}
+		sizeSum += numberDataItems[numberClass];
+	}
+	vector<Data> buffReturn;
+	buffReturn.push_back(teach);
+	buffReturn.push_back(test);
+	buffReturn.push_back(control);
+	return buffReturn;
+}
+//---------------------------------------------------------
+vector<int> ParseData::getClassDistribution() {
+	return(numberDataItems);
 }
 //---------------------------------------------------------
 Bloc::Bloc(string fPath) {
@@ -139,9 +172,7 @@ Bloc::Bloc(string fPath) {
 		}
 	}
 }
-
 //---------------------------------------------------------
-
 ParseData::ParseData(string dPath) {
 	path directWithClasses(dPath);
 
@@ -187,10 +218,92 @@ ParseData::ParseData(string dPath) {
 		cout << endl << "	Path: " + dPath + " is a not directory" << endl;
 	}
 }
+//---------------------------------------------------------
+//Cross validatiom methots.
+//---------------------------------------------------------
+vector<CrossValid> CrossValidation(vector<int> classDistribution) {
+	srand(time(0));
+	vector<CrossValid> buffReturn;
+	for (int sizeData : classDistribution) {
+		CrossValid buffPush;
+		vector<int> vForRandCreate;
+		for (int i = 0; i < sizeData; i++)
+			vForRandCreate.push_back(i);
+		size_t  sizeTeach, sizeTest, sizeControl;
+		sizeTeach = sizeData*0.6;
+		sizeTest = (sizeData - sizeTeach)*0.5;
+		sizeControl = sizeData - sizeTeach - sizeTest;
+		//
+		while (vForRandCreate.size() > 0) {
+			srand(time(0));
+			int randomKey = 0;
+			if (vForRandCreate.size() > 1)
+				randomKey = rand() % (vForRandCreate.size() - 1);
+
+			if (vForRandCreate.size() > (sizeTest + sizeControl)) {
+				buffPush.teach.push_back(vForRandCreate[randomKey]);
+				vForRandCreate.erase(vForRandCreate.begin() + randomKey);
+			}
+			else if (vForRandCreate.size() > sizeControl) {
+				buffPush.test.push_back(vForRandCreate[randomKey]);
+				vForRandCreate.erase(vForRandCreate.begin() + randomKey);
+			}
+			else {
+				buffPush.control.push_back(vForRandCreate[randomKey]);
+				vForRandCreate.erase(vForRandCreate.begin() + randomKey);
+
+			}
+		}
+		buffReturn.push_back(buffPush);
+	}
+	return buffReturn;
+}
+//---------------------------------------------------------
+void saveCrossValid(string Path, vector<CrossValid> v) {
+	std::ofstream out(Path);
+	out << v.size() << endl;
+	for (size_t i = 0; i < v.size(); i++) {
+		out << v[i].teach.size() << " " << v[i].test.size() << " " << v[i].control.size() << endl;
+		std::copy(v[i].teach.begin(), v[i].teach.end(), std::ostream_iterator<int>(out, " "));
+		out << endl;
+		std::copy(v[i].test.begin(), v[i].test.end(), std::ostream_iterator<int>(out, " "));
+		out << endl;
+		std::copy(v[i].control.begin(), v[i].control.end(), std::ostream_iterator<int>(out, " "));
+		out << endl;
+	}
+
+
+}
 
 //---------------------------------------------------------
-
-
+vector<CrossValid> readCrossValid(string Path) {
+	std::ifstream in(Path);
+	vector<CrossValid> buffReturn;
+	int kol;
+	in >> kol;
+	for (int i = 0; i < kol; i++) {
+		CrossValid buffPush;
+		int kolTeach, kolTest, kolControl;
+		in >> kolTeach >> kolTest >> kolControl;
+		for (int j = 0; j < kolTeach; j++) {
+			int b;
+			in >> b;
+			buffPush.teach.push_back(b);
+		}
+		for (int j = 0; j < kolTest; j++) {
+			int b;
+			in >> b;
+			buffPush.test.push_back(b);
+		}
+		for (int j = 0; j < kolControl; j++) {
+			int b;
+			in >> b;
+			buffPush.control.push_back(b);
+		}
+		buffReturn.push_back(buffPush);
+	}
+	return buffReturn;
+}
 //---------------------------------------------------------
 // Private methods.!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //---------------------------------------------------------

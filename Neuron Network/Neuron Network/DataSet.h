@@ -8,12 +8,13 @@
 #include <iterator>
 #include <iostream>
 #include <fstream>
+#include <ctime>
 #include <boost/filesystem.hpp>
 using namespace boost::filesystem;
 using namespace std;
 
 
-vector<string> getDirectoryAttachments(string dPath);
+
 //---------------------------------------------------------
 struct Data
 {
@@ -21,7 +22,14 @@ struct Data
 	vector<vector<double>> answer;
 };
 //---------------------------------------------------------
-
+	struct CrossValid{
+		vector<int> teach;
+		vector<int> test;
+		vector<int> control;
+	};
+	vector<CrossValid> CrossValidation(vector<int> classDistribution);
+	vector<CrossValid> readCrossValid(string Path);
+	void saveCrossValid(string Path, vector<CrossValid> v);
 //---------------------------------------------------------
 class Bloc {
 
@@ -42,13 +50,16 @@ private:
 
 //---------------------------------------------------------
 class ParseData {
+
 public:
 	ParseData();
 	virtual ~ParseData();
 	ParseData(string dPath);
 	vector<Data> getDataTEST();
-	
+	vector<int> getClassDistribution();
+	vector<Data> ParseData::getDataCrossValid(vector<CrossValid> crossV);
 private:
+	static vector<string> getDirectoryAttachments(string dPath);
 	vector<vector<double>> dataAnswer;
 	vector<Bloc> blocSet;
 	vector<int> numberDataItems;

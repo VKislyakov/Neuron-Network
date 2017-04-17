@@ -10,6 +10,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <cmath>
+#include <ctime>
 using namespace std;
 
 class Net

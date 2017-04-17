@@ -8,6 +8,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <cmath>
+#include <ctime>
 #include <Eigen/SVD>
 #include <algorithm> // for copy
 #include <iterator> // for ostream_iterator
@@ -17,7 +18,7 @@ using namespace Eigen;
 double divider(double a) {
 	if (abs(a) > 10)
 		return(100);
-	if (abs(a) > 1)
+	if (abs(a) > 0.2)
 		return(10);
 	return(1);
 }
@@ -32,13 +33,10 @@ int divisionComponents(vector<vector<double>> &x, double buffDiv1, double buffDi
 			x[i][1] = x[i][1] / buffDiv2;
 	return (0);
 }
-//---------------------------------------------------------
-void teachNet() {
+
+void teachNet(ParseData a1) {
 	cout << "Teach Net" << endl;
 	string Path1, Path2;
-
-	cout << "Path to data: " << endl;
-	getline(cin, Path1);
 
 	cout << "Path to save: " << endl;
 	getline(cin, Path2);
@@ -49,8 +47,7 @@ void teachNet() {
 
 	cout << "Number of components = ";
 	cin >> kolComp;
-
-	ParseData a1(Path1);
+	
 	vector<Data> b1 = a1.getDataTEST();
 	moduleSVD c1(b1[0].data);
 	//-----------------------------------------------------
@@ -64,7 +61,6 @@ void teachNet() {
 	divisionComponents(testX, divider(x[0][0]), divider(x[0][1]));
 	divisionComponents(x, divider(x[0][0]), divider(x[0][1]));
 	
-	
 	vector<int> settings_net = { 2,kolComp,kolNeu,14 }; // настройки сети
 	Net generalNet(settings_net);
 	generalNet.savePath = Path2;
@@ -72,7 +68,7 @@ void teachNet() {
 
 }
 
-void workNet() {
+void workNet(ParseData a1) {
 	cout << "Work Net!" << endl;
 	string Path1, Path2, Path3;
 
@@ -185,20 +181,34 @@ void lookAnswerData() {
 		out << endl;
 	}
 }
+//---------------------------------------------------------
 
+//---------------------------------------------------------
 int main(int argc, char* argv[]) {
+	
 	string start;
-	cout << "teach\nwork\nlook\n";
+	cout << "Path data" << endl;
+	getline(cin, start);
+	ParseData ir(start+"\ir");
+	ParseData diod(start + "\diod");
+	ParseData visible(start + "\visible");
+
+	cout << "\nteach\nwork\nlook\n";
 	getline(cin, start);
 	cout << endl;
 	if (start == "teach")
-
 		teachNet();
+
 	if (start == "work")
-
 		workNet();
-	if ((start == "look"))
 
+	if ((start == "look"))
 		lookAnswerData();
+	ParseData c(start);
+	vector<CrossValid> a = CrossValidation(c.getClassDistribution());
+	vector<Data> t = c.getDataTEST();
+	vector<Data> cro = c.getDataCrossValid(a);
+	
+	
 	return 0;
 }
