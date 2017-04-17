@@ -271,10 +271,7 @@ void saveCrossValid(string Path, vector<CrossValid> v) {
 		std::copy(v[i].control.begin(), v[i].control.end(), std::ostream_iterator<int>(out, " "));
 		out << endl;
 	}
-
-
 }
-
 //---------------------------------------------------------
 vector<CrossValid> readCrossValid(string Path) {
 	std::ifstream in(Path);

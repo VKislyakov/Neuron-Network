@@ -34,7 +34,7 @@ int divisionComponents(vector<vector<double>> &x, double buffDiv1, double buffDi
 	return (0);
 }
 
-void teachNet(ParseData a1) {
+void teachNet(vector<Data> b1) {
 	cout << "Teach Net" << endl;
 	string Path1, Path2;
 
@@ -47,8 +47,7 @@ void teachNet(ParseData a1) {
 
 	cout << "Number of components = ";
 	cin >> kolComp;
-	
-	vector<Data> b1 = a1.getDataTEST();
+	cout << endl << "	start SVD" << endl;
 	moduleSVD c1(b1[0].data);
 	//-----------------------------------------------------
 	vector<vector<double>> x, testX, d, testD;
@@ -68,17 +67,10 @@ void teachNet(ParseData a1) {
 
 }
 
-void workNet(ParseData a1) {
+void workNet(vector<Data> b1) {
 	cout << "Work Net!" << endl;
 	string Path1, Path2, Path3;
-
-	cout << "Path to data: " << endl;
-	getline(cin, Path1);
-
-	
-
-	ParseData a1(Path1);
-	vector<Data> b1 = a1.getDataTEST();
+	cout << endl << "	start SVD" << endl;
 	moduleSVD c1(b1[0].data);
 	//-----------------------------
 	cout << endl << "Path to save: " << endl;
@@ -137,12 +129,10 @@ void workNet(ParseData a1) {
 	std::copy(answerNet.begin(), answerNet.end(), std::ostream_iterator<int>(out, "\n"));
 }
 
-void lookAnswerData() {
+void lookAnswerData(vector<Data> b1) {
 	cout << "Work Net!" << endl;
 	string Path1, Path2, Path3;
 
-	cout << "Path to data: " << endl;
-	getline(cin, Path1);
 	cout << "Path to save: " << endl;
 	getline(cin, Path2);
 	cout << "Path to weight: " << endl;
@@ -154,9 +144,7 @@ void lookAnswerData() {
 
 	Net generalNet(Path2);
 	generalNet.savePath = Path2;
-
-	ParseData a1(Path1);
-	vector<Data> b1 = a1.getDataTEST();
+	cout << endl << "	start SVD" << endl;
 	moduleSVD c1(b1[0].data);
 
 	vector<vector<double>> xControl, dControl;
@@ -189,25 +177,34 @@ int main(int argc, char* argv[]) {
 	string start;
 	cout << "Path data" << endl;
 	getline(cin, start);
-	ParseData ir(start+"\ir");
-	ParseData diod(start + "\diod");
-	ParseData visible(start + "\visible");
+	ParseData data(start);
+	//ParseData diod(start + "\diod");
+	//ParseData visible(start + "\visible");
+		cout << "\nteach\nwork\nlook\n";
+		getline(cin, start);
+		cout << endl;
+		if (start == "teach") {
+			getline(cin, start);
+			cout << endl;
+			if (start == "NewCross") {
+				vector<CrossValid> crossV = CrossValidation( data.getClassDistribution());
+				getline(cin, start);
+				cout << endl;
+				saveCrossValid(start, crossV);
+				vector<Data> b1 = data.getDataCrossValid(crossV);
+				teachNet(b1);
+			}
 
-	cout << "\nteach\nwork\nlook\n";
-	getline(cin, start);
-	cout << endl;
-	if (start == "teach")
-		teachNet();
 
-	if (start == "work")
-		workNet();
 
-	if ((start == "look"))
-		lookAnswerData();
-	ParseData c(start);
-	vector<CrossValid> a = CrossValidation(c.getClassDistribution());
-	vector<Data> t = c.getDataTEST();
-	vector<Data> cro = c.getDataCrossValid(a);
+		}
+		/*if (start == "work")
+			workNet();
+
+		if ((start == "look"))
+			lookAnswerData();
+	*/
+
 	
 	
 	return 0;
