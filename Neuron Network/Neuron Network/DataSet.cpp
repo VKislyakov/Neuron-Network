@@ -18,7 +18,19 @@ Bloc::~Bloc() {
 }
 //---------------------------------------------------------
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+double divider(double a) {
+	if (abs(a) > 10)
+		return(100);
+	if (abs(a) > 0.88)
+		return(10);
+	return(1);
+}
 
+void divisionComponents(vector<vector<double>> &x, double buffDiv1) {
+
+	for (size_t i = 0; i < x.size(); i++)
+		x[i][0] = x[i][0] / buffDiv1;
+}
 //---------------------------------------------------------
 // Public methods.!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //---------------------------------------------------------
@@ -222,7 +234,7 @@ ParseData::ParseData(string dPath) {
 //Cross validatiom methots.
 //---------------------------------------------------------
 vector<CrossValid> CrossValidation(vector<int> classDistribution) {
-	srand(time(0));
+	//srand(time(0));
 	vector<CrossValid> buffReturn;
 	for (int sizeData : classDistribution) {
 		CrossValid buffPush;
@@ -235,7 +247,7 @@ vector<CrossValid> CrossValidation(vector<int> classDistribution) {
 		sizeControl = sizeData - sizeTeach - sizeTest;
 		//
 		while (vForRandCreate.size() > 0) {
-			srand(time(0));
+			//srand(time(0));
 			int randomKey = 0;
 			if (vForRandCreate.size() > 1)
 				randomKey = rand() % (vForRandCreate.size() - 1);

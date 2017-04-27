@@ -33,7 +33,7 @@
     <ClCompile Include="moduleSVD.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="SpectralСlassifier.cpp">
+    <ClCompile Include="SpectralClassifier.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
   </ItemGroup>
@@ -53,7 +53,7 @@
     <ClInclude Include="moduleSVD.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="SpectralСlassifier.h">
+    <ClInclude Include="SpectralClassifier.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>

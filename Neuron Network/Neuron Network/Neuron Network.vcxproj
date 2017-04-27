@@ -128,7 +128,7 @@
     <ClCompile Include="Net.cpp" />
     <ClCompile Include="Neuron.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="SpectralСlassifier.cpp" />
+    <ClCompile Include="SpectralClassifier.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataSet.h" />
@@ -136,7 +136,7 @@
     <ClInclude Include="moduleSVD.h" />
     <ClInclude Include="Net.h" />
     <ClInclude Include="Neuron.h" />
-    <ClInclude Include="SpectralСlassifier.h" />
+    <ClInclude Include="SpectralClassifier.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -14,12 +14,17 @@ using namespace boost::filesystem;
 using namespace std;
 
 
-
+double divider(double a);
+void divisionComponents(vector<vector<double>> &x, double buffDiv1);
 //---------------------------------------------------------
 struct Data
 {
 	vector<vector<double>> data;
 	vector<vector<double>> answer;
+	 void inline clear() { // проверить правильность
+		this->data.clear();
+		this->answer.clear();
+	}
 };
 //---------------------------------------------------------
 	struct CrossValid{
@@ -28,7 +33,9 @@ struct Data
 		vector<int> control;
 	};
 	vector<CrossValid> CrossValidation(vector<int> classDistribution);
+	// Ex: C\\VKR\\"fileName".txt
 	vector<CrossValid> readCrossValid(string Path);
+	// Ex: C\\VKR\\"fileName".txt
 	void saveCrossValid(string Path, vector<CrossValid> v);
 //---------------------------------------------------------
 class Bloc {

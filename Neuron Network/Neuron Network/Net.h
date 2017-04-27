@@ -11,23 +11,38 @@
 #include <cstdlib>
 #include <cmath>
 #include <ctime>
+#include <numeric>
 using namespace std;
 
 class Net
 {
 public:
 	// Path to save weights.
+	// 
 	string savePath;
 
-	// Generates net with random scales.
+	// Generates net with random weights.
+	// conf[0] - numder of layers.
+	// conf[1] - number of input data.
+	// conf[2,3...] - number of neyrons on layer 2,3...
 	Net(vector<int> conf); 
 
 	// Generates net based on a three-dimensional matrix of weights.
 	Net(vector<vector<vector<double>>> wieght); 
 	
 	// Generates a network from a file.
+	// Ex: "C:\user\weight.txt"
 	Net(string Path); 
+
+	// возврящает кол-во входных данных
+	int getNumberInputData();
 	
+	// возврошает ответы на данные
+	vector<vector<double>> workResult(vector<vector<double>> x);
+
+	// 
+	double percentTrueAnswer(vector<vector<double>> xControl, vector<vector<double>> dControl);
+
 	// Runs net for vector x.
 	vector<double> startNet(vector<double> x); 
 
@@ -57,7 +72,7 @@ private:
 	double goldenSection(vector<vector<double>> delta, vector<double> x, vector<double> d); 
 
 	double teach(vector<double> x, vector<double> d);
-
+	// 
 	vector<vector<vector<double>>> save(int i);
 
 

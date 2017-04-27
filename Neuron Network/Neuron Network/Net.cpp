@@ -63,6 +63,42 @@ Net::Net(string Path)
 	}
 }
 //---------------------------------------------------------
+int Net::getNumberInputData() {
+	return config[1];
+}
+//---------------------------------------------------------
+vector<vector<double>> Net::workResult(vector<vector<double>> x) {
+	vector<vector<double>> buffReturn;
+	for (auto xItem : x)
+		buffReturn.push_back(startNet(xItem));
+	return buffReturn;
+}
+//---------------------------------------------------------
+double Net::percentTrueAnswer(vector<vector<double>> xControl, vector<vector<double>> dControl)
+{
+	double trueAnswer = 0;
+
+	for (size_t i = 0; i < xControl.size(); i++) {
+		vector<double> y = startNet(xControl[i]);
+		int answerY = 0, answerD = 0;
+		double maxY = 0, maxD = 0;
+		for (decltype(y.size()) j = 0; j < y.size(); j++) {
+			if (y[j] > maxY) {
+				maxY = y[j];
+				answerY = j;
+			}
+			if (dControl[i][j] > maxD) {
+				maxD = dControl[i][j];
+				answerD = j;
+			}
+		}
+		if (answerD == answerY) {
+			trueAnswer++;
+		}
+	}
+	return 100*(trueAnswer/ xControl.size());
+}
+//---------------------------------------------------------
 vector<double> Net::startNet(vector<double> x) {
 	for (int i = 0; i < config[0]; i++) {
 		x = layers[i].actF(x);
@@ -72,18 +108,18 @@ vector<double> Net::startNet(vector<double> x) {
 //---------------------------------------------------------
 int Net::teaching(vector<vector<double>> x, vector<vector<double>> d, vector<vector<double>> testX, vector<vector<double>> testD, double e) {
 	srand(time(0));
-	cout << endl << "Start teach" << endl;
+	std::cout << endl << "Start teach" << endl;
 	int numberEpoch = 0;
 	int	random_key = 0;
 	int iter = 0;
 	int errorControlEndNumber = 0;
-	bool epochControl = true, diffControl = true, minControl = true;
+	bool epochControl = true, diffControl = true, minControl = true, standardDeviation = true;
 	ofstream outErrouTeach(savePath + "\\error_teach.txt");
 	double errorTeach = 10, errorMax = 0, errorMin = 5000, errorTest = 0, errorMinTest = 100;
 	vector<int> numberTeachItem(x.size(),0);
-	list<double> diffTeachTestErrou;
+	list<double> diffTeachTestErrou, standardDeviationList;
 	// Begin teach.
-	while (errorTeach > e && numberEpoch < 1000 && (diffControl || minControl)) {
+	while (errorTeach > e && ((numberEpoch < 1500) || minControl) &&  minControl) {
 		for (auto v : numberTeachItem)
 			epochControl = epochControl && v;
 		if (epochControl) {
@@ -91,7 +127,7 @@ int Net::teaching(vector<vector<double>> x, vector<vector<double>> d, vector<vec
 			vector<int> a(x.size(), 0);
 			numberTeachItem = a;
 			numberEpoch++;
-			save(numberEpoch);
+			//save(numberEpoch);
 			errorTeach = 0;
 			errorTest = 0;
 			errorMax = 0;
@@ -113,15 +149,15 @@ int Net::teaching(vector<vector<double>> x, vector<vector<double>> d, vector<vec
 			}
 			errorTeach = errorTeach / x.size();
 			// Error records by epoch number in console.
-			cout << endl << numberEpoch << " == " << errorTeach << endl;
-			cout << " TEST == " << errorTest << endl;
-			cout << " MinErrou = " << errorMin << " MaxErrou = " << errorMax << endl;
+			std::cout << endl << numberEpoch << " == " << errorTeach << endl;
+			std::cout << " TEST == " << errorTest << endl;
+			std::cout << " MinErrou = " << errorMin << " MaxErrou = " << errorMax << endl;
 			// Error records by epoch number in file.
 			outErrouTeach << numberEpoch << " " << errorTeach << " " << errorTest << endl;
 			// Monitoring of the change in the minimum error on the test set.
 			if (diffControl) {
-				if (numberEpoch == 1)
-					for (size_t i = 0; i < 5; i++)
+				if (numberEpoch == 1) 
+					for (size_t i = 0; i < 6; i++)
 						diffTeachTestErrou.push_back(abs(errorTest - errorTeach));
 				else {
 					diffTeachTestErrou.push_back(errorTest - errorTeach);
@@ -131,10 +167,27 @@ int Net::teaching(vector<vector<double>> x, vector<vector<double>> d, vector<vec
 				for (auto item : diffTeachTestErrou) {
 					sumDiff += item;
 				}
-				if (sumDiff / 5 > 0.06)
+				if (sumDiff / 6 > 0.08)
 					diffControl = false;
 			}
-			if (!(diffControl) && minControl && ((errorMinTest + 0.01) >= errorTest)) {
+			if (standardDeviation) {
+				if(numberEpoch == 1)
+					for (size_t i = 0; i < 20; i++)
+						standardDeviationList.push_back(errorTest);
+				else {
+					standardDeviationList.push_back(errorTest);
+					standardDeviationList.pop_front();
+				}
+				if (numberEpoch > 30) {
+					double x_ = accumulate(standardDeviationList.begin(), standardDeviationList.end(), 0)/20;
+					double s = 0;
+					for (auto stanDevItem: standardDeviationList)
+						s += (stanDevItem - x_)*(stanDevItem - x_);
+					if (sqrt(s / 20) < 0.001) 
+						standardDeviation = false;
+				}
+			}
+			if ((!diffControl || (numberEpoch > 1500) || !standardDeviation) && minControl && ((errorMinTest + 0.001) >= errorTest)) {
 				minControl = false;
 				continue;
 			}
@@ -148,9 +201,9 @@ int Net::teaching(vector<vector<double>> x, vector<vector<double>> d, vector<vec
 			numberTeachItem[random_key]++;
 		} while (numberTeachItem[random_key]>3);
 
-		cout << "\r\t\t\t\t\t\t\t\r=== Iter " << iter << "\t"<< numberTeachItem[random_key];
+		std::cout << "\r\t\t\t\t\t\t\t\r=== Iter " << iter << "\t"<< numberTeachItem[random_key];
 		double buffErrou = teach(x[random_key], d[random_key]);
-		cout << "\tENDteach ===";
+		std::cout << "\tENDteach ===";
 		if (buffErrou < errorMin + (errorMax - errorMin)*0.70)
 			numberTeachItem[random_key] = 3;
 	}
