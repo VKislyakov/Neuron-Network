@@ -63,7 +63,8 @@ private:
 	int kol_sloev;
 	vector<int> config;
 	vector<Layer> layers;
-	
+	double goldEps = 0.01;
+
 
 	vector<vector<double>> deltaM(vector<double> d);
 

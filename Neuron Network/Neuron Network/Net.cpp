@@ -118,8 +118,11 @@ int Net::teaching(vector<vector<double>> x, vector<vector<double>> d, vector<vec
 	double errorTeach = 10, errorMax = 0, errorMin = 5000, errorTest = 0, errorMinTest = 100;
 	vector<int> numberTeachItem(x.size(),0);
 	list<double> diffTeachTestErrou, standardDeviationList;
+	//---
+	bool miniGold = false;
+	//---
 	// Begin teach.
-	while (errorTeach > e && ((numberEpoch < 1500) || minControl) &&  minControl) {
+	while (errorTeach > e && minControl && diffControl && standardDeviation) {
 		for (auto v : numberTeachItem)
 			epochControl = epochControl && v;
 		if (epochControl) {
@@ -183,11 +186,11 @@ int Net::teaching(vector<vector<double>> x, vector<vector<double>> d, vector<vec
 					double s = 0;
 					for (auto stanDevItem: standardDeviationList)
 						s += (stanDevItem - x_)*(stanDevItem - x_);
-					if (sqrt(s / 20) < 0.001) 
+					if (sqrt(s / 20) < 0.003) 
 						standardDeviation = false;
 				}
 			}
-			if ((!diffControl || (numberEpoch > 1500) || !standardDeviation) && minControl && ((errorMinTest + 0.001) >= errorTest)) {
+			if ((numberEpoch > 750) || ((numberEpoch > 700) && (errorMinTest + 0.001) >= errorTest)) {
 				minControl = false;
 				continue;
 			}
@@ -202,6 +205,19 @@ int Net::teaching(vector<vector<double>> x, vector<vector<double>> d, vector<vec
 		} while (numberTeachItem[random_key]>3);
 
 		std::cout << "\r\t\t\t\t\t\t\t\r=== Iter " << iter << "\t"<< numberTeachItem[random_key];
+		//-------
+		if ((numberEpoch == 0) ||  (errorTeach - e < 0.05) || miniGold) {
+			goldEps = 0.01;
+			if ((errorTeach - e) < 0.05)
+				miniGold = true;
+		}
+		else if(numberEpoch < 200){
+			goldEps = 0.2 + (errorTeach - e) - double(numberEpoch)/1000;
+		}
+		else{
+			goldEps = (errorTeach - e);
+		}
+		//------
 		double buffErrou = teach(x[random_key], d[random_key]);
 		std::cout << "\tENDteach ===";
 		if (buffErrou < errorMin + (errorMax - errorMin)*0.70)
@@ -279,7 +295,7 @@ double Net::goldenSection(vector<vector<double>> delta, vector<double> x, vector
 	vector<double> y;
 	x1 = b - (b - a) / fi;
 	x2 = a + (b - a) / fi;
-	while (abs(b - a) > 0.01) {
+	while (abs(b - a) > goldEps) {
 
 		minimiNet.setLayer(layers);//	!
 		minimiNet.correct(delta, x1, x);

@@ -23,17 +23,29 @@ SpectralClassifier::SpectralClassifier(bool teachOrRead,string Path, string data
 		visibleNet = newNet; }
 	}
 	else {
-		int a, b;
+		int a, b;/*
 		cout << "\nNumber input data & number neuron:\n";
 		cin >> a >> b;
 		vector<int> settings_net = { 2,a,b,14 };
-		{Net newNet(settings_net);
+		*/
+		{cout << "\nNumber input data & number neuron for ir Net:\n";
+		cin >> a >> b;
+		vector<int> settings_net = { 2,a,b,14 };
+		Net newNet(settings_net);
 		irNet = newNet; 
 		irNet.savePath = Path + "\\ir";}
-		{Net newNet(settings_net);
+		//------------------
+		{cout << "\nNumber input data & number neuron for diod Net:\n";
+		cin >> a >> b;
+		vector<int> settings_net = { 2,a,b,14 };
+		Net newNet(settings_net);
 		diodNet = newNet; 
 		diodNet.savePath = Path + "\\diod"; }
-		{Net newNet(settings_net);
+
+		{cout << "\nNumber input data & number neuron for visible net:\n";
+		cin >> a >> b;
+		vector<int> settings_net = { 2,a,b,14 };
+		Net newNet(settings_net);
 		visibleNet = newNet; 
 		visibleNet.savePath = Path + "\\visible"; }
 	}
@@ -60,13 +72,13 @@ SpectralClassifier::SpectralClassifier(bool teachOrRead,string Path, string data
 	cout << "end SVD" << endl;
 	Data buffPush;
 
-	//-----------
+	//---------------------------------------------------------------
 	if (teachOrRead) {
 		teachOneClassifier(visibleNet, svdVisible, dataVisible, 0.06);
 		teachOneClassifier(irNet, svdIr, dataIr, 0.07);
-		teachOneClassifier(diodNet, svdDiod, dataDiod, 0.185);
+		teachOneClassifier(diodNet, svdDiod, dataDiod, 0.195);
 	}
-	//-----------
+	//----------------------------------------------------------------
 	vector<vector<double>> xIr,xDiod,xVisible;
 	// Ir1
 	
@@ -101,7 +113,7 @@ SpectralClassifier::SpectralClassifier(bool teachOrRead,string Path, string data
 	cout << "clr" << endl;
 	buffPush.clear();
 	
-	//----------------------
+	//---------------------------------------------------------------------------
 	// Ir2
 	xIr = svdIr.getNewhData(irNet.getNumberInputData(), dataIr[1].data);
 	divisionComponents(xIr, xIrDiv);
@@ -129,7 +141,7 @@ SpectralClassifier::SpectralClassifier(bool teachOrRead,string Path, string data
 	buffPush.answer = dataVisible[1].answer;
 	dataCollegium.push_back(buffPush);
 	buffPush.clear();
-	//---------------------
+	//-----------------------------------------------------------------------
 	// Ir3
 	std::ofstream out(Path + "\\percentTrue_3_Net.txt");
 
@@ -172,7 +184,17 @@ void SpectralClassifier::teachSR(double e) {
 	out << classifier.percentTrueAnswer(dataCollegium[2].data,dataCollegium[2].answer);
 }
 //----------------------------------------------------------
+void SpectralClassifier::teachSR_multi(int neuron,double e) {
+	vector<int> conf = { 2,42,neuron,14 };
+	Net newNet(conf);
+	classifier = newNet;
+	classifier.savePath = PathS + "\\" + to_string(neuron);
+	classifier.teaching(dataCollegium[0].data, dataCollegium[0].answer, dataCollegium[1].data, dataCollegium[1].answer, e);
+	std::ofstream out(PathS + "\\" + to_string(neuron) + "\\percentTrueCR.txt");
+	out << classifier.percentTrueAnswer(dataCollegium[2].data, dataCollegium[2].answer);
+}
 
+//----------------------------------------------------------
 void SpectralClassifier::teachOneClassifier(Net &generalNet, moduleSVD &svd, vector<Data> &data, double e) {
 	vector<vector<double>> x, testX, d, testD;
 

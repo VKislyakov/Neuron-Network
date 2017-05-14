@@ -30,7 +30,7 @@ public:
 	SpectralClassifier(bool teachOrRead,string Path, string dataPath);
 	void teachSR(double e = 0.01);
 	void SpectralClassifier::teachOneClassifier(Net &generalNet, moduleSVD &svd, vector<Data> &data, double e);
-
+	void teachSR_multi(int neuron, double e = 0.01);
 
 	
 };
