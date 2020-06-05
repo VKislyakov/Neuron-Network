@@ -11,29 +11,29 @@ class Neuron
 public:
 	Neuron() = default;
 
-	Neuron(int number_weight);
+	explicit Neuron(int number_weight);
 
-	Neuron(vector<double> verton_weight);
+	explicit Neuron(const vector<double>& weights);
 
 	virtual ~Neuron() = default;
 
-	vector<double> getAllWeights();
+	vector<double> getAllWeights() const;
 
-	double getElemWeight(int number);
+	double getElemWeight(int number) const;
 
-	double Sum(vector<double> x);
+	double Sum(const vector<double>&  x);
 
-	double Sum();
+	double Sum() const;
 
-	double ActF(vector<double> x);
+	double ActF(const vector<double>&  x);
 
-	double ActF();
+	double ActF() const;
 
-	double derF();
+	double derF() const;
 
-	void correctWeights(double deltaW, vector<double> y, double alfa);
+	void correctWeights(double deltaW, const vector<double>&  y, double alfa);
 
-	void setNewVectorWeights(vector<double> W);
+	void setNewVectorWeights(const vector<double>&  W);
 private:
     vector<double> weights;
     double sum = 0;

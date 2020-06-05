@@ -1,9 +1,5 @@
 #include "Layer.h"
 
-Layer::~Layer() {
-}
-Layer::Layer() {
-}
 
 Layer::Layer(int early_kol_neu, int kol_neu) {
 	for (int i = 0; i < kol_neu; i++) {
@@ -14,8 +10,8 @@ Layer::Layer(int early_kol_neu, int kol_neu) {
 	}
 }
 
-Layer::Layer(vector<vector<double>> W) {
-	for (decltype(W.size()) i = 0; i < W.size(); i++) {
+Layer::Layer(const vector<vector<double>>& W) {
+	for (size_t i = 0; i < W.size(); i++) {
 		Neuron a(W[i]);
 		neurons.push_back(a);
 		activ_f.push_back(0);
@@ -23,7 +19,7 @@ Layer::Layer(vector<vector<double>> W) {
 	}
 }
 
-vector<double> Layer::actF(vector<double> X) {
+vector<double> Layer::actF(const vector<double>& X) {
 	for (decltype(neurons.size()) i = 0; i < neurons.size(); i++) {
 		activ_f[i] = neurons[i].ActF(X);
 		sum_s[i] = neurons[i].Sum();
@@ -31,30 +27,30 @@ vector<double> Layer::actF(vector<double> X) {
 	return(activ_f);
 }
 
-vector<double> Layer::actF() {
+vector<double> Layer::actF() const{
 	return(activ_f);
 }
 
-vector<double> Layer::derF() {
+vector<double> Layer::derF() const {
 	vector<double> getBack;
-	for (auto neuron : neurons)
+	for (const auto& neuron : neurons)
 		getBack.push_back(neuron.derF());
 	return(getBack);
 }
 
 
-int Layer::correct(vector<double> deltw, vector<double> y, double alfa) {
+int Layer::correct(const vector<double>& deltw, const vector<double>& y, double alfa) {
 	for (decltype(neurons.size()) i = 0, sz = neurons.size(); i < sz; i++) {
 		neurons[i].correctWeights(deltw[i], y, alfa);
 	}
 	return 0;
 }
 
-vector<double> Layer::getVectorW(int i) { //
+vector<double> Layer::getVectorW(int i) const { //
 	return neurons[i].getAllWeights();
 }
 
-vector<vector<double>> Layer::getMatrixW() { //
+vector<vector<double>> Layer::getMatrixW() const { //
 	vector<vector<double>> matrix;
 	for (decltype(neurons.size()) i = 0; i<neurons.size(); i++) {
 		matrix.push_back(getVectorW(i));

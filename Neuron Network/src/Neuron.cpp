@@ -6,16 +6,16 @@ Neuron::Neuron(int number_weight) {
 		weights.push_back(0.0001 * (rand() % 6001 - 3000));  //magic number??
 }
 
-Neuron::Neuron(vector<double> verton_weight)
-: weights(verton_weight)
+Neuron::Neuron(const vector<double>& weights)
+: weights(weights)
   {}
 
-vector<double> Neuron::getAllWeights() {
+vector<double> Neuron::getAllWeights() const{
 	return weights;
 }
 
-double Neuron::getElemWeight(int number) {
-	return(weights[number]);
+double Neuron::getElemWeight(int number) const {
+	return weights[number];
 }
 
 double Neuron::Sum(const vector<double>& x) {
@@ -25,7 +25,7 @@ double Neuron::Sum(const vector<double>& x) {
 	return sum;
 }
 
-double Neuron::Sum() {
+double Neuron::Sum() const {
 	return sum;
 }
 
@@ -42,11 +42,11 @@ double Neuron::ActF(const vector<double>& x) {
 	return F;
 }
 
-double Neuron::ActF() {
+double Neuron::ActF() const {
 	return F;
 }
 
-double Neuron::derF() {
+double Neuron::derF() const {
 	return (1 - F)*F;
 	//return 1-F*F;
 }

@@ -2,6 +2,7 @@
 
 #ifndef LAYER_H
 #define LAYER_H
+
 #include "Neuron.h"
 #include <vector>
 #include <cmath>
@@ -10,26 +11,25 @@ using namespace std;
 class Layer {
 
 public:
-
-	Layer();
+	Layer() = default;
 
 	Layer(int early_kol_neu, int kol_neu);
 
-	Layer(vector<vector<double>> W);
+ 	explicit Layer(const vector<vector<double>>& W);
 
-	virtual ~Layer();
+	virtual ~Layer() = default;
 
-	vector<double> actF(vector<double> X);
+	vector<double> actF(const vector<double>& X);
 
-	vector<double> actF();
+	vector<double> actF() const;
 
-	vector<double> derF();
+	vector<double> derF() const;
 
-	int correct(vector<double> deltw, vector<double> y, double alfa);
+	int correct(const vector<double>& deltw, const vector<double>& y, double alfa);
 
-	vector<double> getVectorW(int i);
+	vector<double> getVectorW(int i) const;
 
-	vector<vector<double>> getMatrixW();
+	vector<vector<double>> getMatrixW() const;
 
 private:
 	vector<Neuron> neurons;
