@@ -8,18 +8,14 @@ using namespace std;
 
 class Neuron
 {
-private:
-	vector<double> weights;
-	double sum;
-	double F;
 public:
-	Neuron();
+	Neuron() = default;
 
 	Neuron(int number_weight);
 
 	Neuron(vector<double> verton_weight);
 
-	virtual ~Neuron();
+	virtual ~Neuron() = default;
 
 	vector<double> getAllWeights();
 
@@ -38,8 +34,10 @@ public:
 	void correctWeights(double deltaW, vector<double> y, double alfa);
 
 	void setNewVectorWeights(vector<double> W);
-
-
+private:
+    vector<double> weights;
+    double sum = 0;
+    double F = 0;
 };
 
 #endif // !NEURON_H
