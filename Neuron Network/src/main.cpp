@@ -33,7 +33,9 @@ void teachOneNet(Net &generalNet, moduleSVD &svd, vector<Data> &data, double e ,
 }
 
 int main(int argc, char* argv[]) {
-	
+
+    // test Code Review
+
 	string start;
 	cout << "\n1)Create Cross\n2)Start without teach\n3)Start with teach";
 	getline(cin, start);
